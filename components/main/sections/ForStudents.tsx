@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { User, TrendingUp, Target, Award } from "lucide-react";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Badge } from "@/components/ui/badge";
-import DashboardPreviewCard from "../DashboardPreviewCard";
+import DashboardPreviewCard from "../../mockup/StudentDashboardVisual";
 
 // Data for the benefit list
 const studentBenefits = [
@@ -38,7 +37,7 @@ const ForStudentsSection = () => {
     },
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {
       opacity: 1,
@@ -99,7 +98,7 @@ const ForStudentsSection = () => {
                   variants={textVariants}
                   className="flex items-start gap-4"
                 >
-                  <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-secondary">
+                  <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary">
                     <benefit.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
@@ -117,7 +116,7 @@ const ForStudentsSection = () => {
 
           {/* === Right Column: Preview card === */}
           <motion.div
-            className="flex items-center justify-center"
+            className="flex items-center justify-center transition-transform duration-300 ease-out hover:scale-105"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.5 }}

@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Briefcase, Edit, BarChartHorizontal, Timer } from "lucide-react";
 import { Wrapper } from "@/components/ui/wrapper";
 import { Badge } from "@/components/ui/badge";
-import TutorDashboardPreviewCard from "@/components/TutorDashboardPreviewCard";
+import TutorDashboardPreviewCard from "@/components/mockup/TutorDashboardVisual";
 
 // Data for the tutor benefit list
 const tutorBenefits = [
@@ -36,19 +35,19 @@ const ForTutorsSection = () => {
     visible: { opacity: 1, x: 0, transition: { duration: 0.5, staggerChildren: 0.1 } },
   };
 
-  const imageVariants = {
+  const imageVariants: Variants = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   return (
     // Using a different background to create visual separation from the previous section
-    <section id="fortutors" className="bg-secondary/50 py-20 sm:py-28">
+    <section id="for-tutors" className="bg-secondary/50 py-20 sm:py-28">
       <Wrapper>
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* === Left Column: Image (Order is flipped here) === */}
           <motion.div
-            className="flex items-center justify-center lg:order-first" // 'order-first' ensures it's on the left on large screens
+            className="flex items-center justify-center lg:order-first transition-transform duration-300 ease-out hover:scale-105" // 'order-first' ensures it's on the left on large screens
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.5 }}
@@ -95,7 +94,7 @@ const ForTutorsSection = () => {
                   variants={textVariants}
                   className="flex items-start gap-4"
                 >
-                  <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-background">
+                  <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-background">
                     <benefit.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>

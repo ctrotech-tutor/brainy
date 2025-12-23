@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brain, Menu, Sparkle } from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils"; // Make sure you have this utility
+import { cn } from "@/lib/utils";
 
 // Shadcn UI Components
 import { Button } from "@/components/ui/button";
@@ -20,9 +19,10 @@ import { Wrapper } from "../ui/wrapper";
 
 const navLinks = [
   { href: "/#features", label: "Features" },
-  { href: "/#courses", label: "Courses" },
+  // { href: "/#courses", label: "Courses" },
   { href: "/#howitworks", label: "How It Works" },
-  { href: "/#fortutors", label: "For Tutors" },
+  { href: "/#for-students", label: "For Students" },
+  { href: "/#for-tutors", label: "For Tutors" },
 ];
 
 const Navbar = () => {
@@ -30,7 +30,7 @@ const Navbar = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
       <Wrapper className="flex h-16 items-center justify-between">
         {/* === Left Side: Logo and Desktop Navigation === */}
         <div className="flex items-center gap-6">
@@ -64,10 +64,10 @@ const Navbar = () => {
           {/* Desktop Buttons */}
           <div className="hidden items-center gap-2 md:flex">
             <Button variant="ghost" asChild>
-              <Link href="/login">Log in</Link>
+              <Link href="/auth/login">Log in</Link>
             </Button>
             <Button asChild>
-              <Link href="/signup">
+              <Link href="/auth/signup">
                 <Sparkle className="mr-2 h-4 w-4" />
                 Get Started
               </Link>
@@ -110,13 +110,13 @@ const Navbar = () => {
                   </nav>
                   <div className="space-y-3 border-t pt-6">
                     <Button className="w-full" asChild>
-                      <Link href="/signup">
+                      <Link href="/auth/signup">
                         <Sparkle className="mr-2 h-4 w-4" />
                         Get Started
                       </Link>
                     </Button>
                     <Button variant="outline" className="w-full" asChild>
-                      <Link href="/login">Log In</Link>
+                      <Link href="/auth/login">Log In</Link>
                     </Button>
                   </div>
                 </div>
@@ -130,3 +130,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// okay so now can i now have a perfcet user flow , workflow from the landing page
