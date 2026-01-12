@@ -41,8 +41,6 @@ const API_PUBLIC_ROUTES = [
   "/api/auth/reset-password",
   "/api/auth/google",
   "/api/auth/google/callback",
-  "/api/universities",
-  "/api/platform/institutions/[id]"
 ];
 
 // ============================================
