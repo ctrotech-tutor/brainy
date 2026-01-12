@@ -84,10 +84,11 @@ export async function proxy(request: NextRequest) {
   
   const isOnboardingRoute = ONBOARDING_ROUTES.some(route => pathname.startsWith(route));
   const isApiRoute = pathname.startsWith("/api/");
+  const isHomePage = pathname === "/";
 
-  if (isAuthenticated && !user?.onboardingComplete && !isOnboardingRoute && !isApiRoute && pathname !== "/") {
+  if (isAuthenticated && !user?.onboardingComplete && !isOnboardingRoute && !isApiRoute && !isHomePage) {
     // User is logged in but hasn't finished onboarding. 
-    // Force them to their onboarding path, UNLESS they are on the home page.
+    // Force them to their onboarding path.
     let redirectPath = "/onboarding/choose-path";
     if (user?.onboardingIntent === "student") {
       redirectPath = "/onboarding/student/start";
@@ -117,7 +118,19 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    // Determine the best dashboard based on roles
+    let dashboardPath = "/dashboard";
+    if (roles.includes("PLATFORM_ADMIN")) {
+      dashboardPath = "/platform/dashboard";
+    } else if (roles.includes("INSTITUTION_ADMIN")) {
+      dashboardPath = "/dashboard/institution";
+    } else if (roles.includes("STUDENT")) {
+      dashboardPath = "/dashboard/student";
+    } else if (roles.includes("TUTOR")) {
+      dashboardPath = "/dashboard/tutor";
+    }
+    
+    return NextResponse.redirect(new URL(dashboardPath, request.url));
   }
 
   // ============================================
@@ -135,11 +148,25 @@ export async function proxy(request: NextRequest) {
   }
 
   // ============================================
-  // DASHBOARD REDIRECT (REMOVED) - We now use the unified /dashboard
+  // DASHBOARD REDIRECT - Route /dashboard to role base
   // ============================================
 
-  // Removed mandatory role-based redirects from /dashboard to allow 
-  // users to access the unified Command Center.
+  if (pathname === "/dashboard" && isAuthenticated) {
+    let dashboardPath = "/dashboard";
+    if (roles.includes("PLATFORM_ADMIN")) {
+      dashboardPath = "/platform/dashboard";
+    } else if (roles.includes("INSTITUTION_ADMIN")) {
+      dashboardPath = "/dashboard/institution";
+    } else if (roles.includes("STUDENT")) {
+      dashboardPath = "/dashboard/student";
+    } else if (roles.includes("TUTOR")) {
+      dashboardPath = "/dashboard/tutor";
+    }
+    
+    if (dashboardPath !== "/dashboard") {
+      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    }
+  }
 
   // ============================================
   // API ROUTES - Check authentication

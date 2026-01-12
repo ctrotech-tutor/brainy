@@ -118,7 +118,6 @@ const HeroSection = ({ user }: HeroSectionProps) => {
               verified academic integrity — all in one system.
             </motion.p>
 
-            {/* --- CTA BUTTONS --- */}
             <motion.div
               variants={itemVariants}
               className="mt-10 flex flex-col gap-4 sm:flex-row"
@@ -130,8 +129,17 @@ const HeroSection = ({ user }: HeroSectionProps) => {
                   asChild
                 >
                   <Link href={getDashboardHref()}>
-                    Go to Your Dashboard
-                    <LayoutDashboard className="ml-2 h-5 w-5" />
+                    {user.onboardingComplete ? (
+                      <>
+                        Go to Your Dashboard
+                        <LayoutDashboard className="ml-2 h-5 w-5" />
+                      </>
+                    ) : (
+                      <>
+                        Resume Onboarding Setup
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </>
+                    )}
                   </Link>
                 </Button>
               ) : (
