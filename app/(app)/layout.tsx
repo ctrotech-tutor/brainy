@@ -5,7 +5,7 @@ import { Brain, LayoutDashboard, Settings, User } from "lucide-react";
 
 // --- 1. Import your authentication and new UserNav component ---
 import { validateRequest } from "@/lib/auth";
-import { UserNav } from "@/components/auth/UserNav";
+import { UserNav } from "@/components/core/user-nav";
 
 // A simple component for sidebar navigation links (no changes needed here)
 const SidebarLink = ({
@@ -33,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   // --- 4. If no user, redirect to the login page ---
   if (!user) {
-    return redirect("/login");
+    return redirect("/auth/login");
   }
 
   // --- 5. If user exists, render the layout ---
@@ -66,7 +66,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             {/* You can add a mobile sidebar trigger or search bar here */}
           </div>
           {/* --- 6. Render the UserNav client component with the user data --- */}
-          <UserNav/>
+          <UserNav user={user}/>
         </header>
 
         {/* --- Page Content --- */}
