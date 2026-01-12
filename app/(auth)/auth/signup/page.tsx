@@ -1,6 +1,7 @@
-// app/(auth)/auth/signup/page.tsx
+import { Suspense } from "react";
 import { Metadata } from "next";
 import SignupClient from "./SignupClient";
+import { Loader2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Create Account",
@@ -8,5 +9,13 @@ export const metadata: Metadata = {
 };
 
 export default function SignupPage() {
-  return <SignupClient />;
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <SignupClient />
+    </Suspense>
+  );
 }
