@@ -8,6 +8,7 @@ import {
   Star,
   Building2,
   ShieldCheck,
+  LayoutDashboard,
 } from "lucide-react";
 
 // UI Components
@@ -17,7 +18,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import QuizPreviewCard from "../../mockup/QuizVisualMockup";
 import { Wrapper } from "@/components/ui/wrapper";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  user?: {
+    name?: string | null;
+    onboardingComplete?: boolean;
+    onboardingIntent?: string | null;
+  } | null;
+}
+
+const HeroSection = ({ user }: HeroSectionProps) => {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -43,6 +52,14 @@ const HeroSection = () => {
       rotate: 2,
       transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] },
     },
+  };
+
+  const getDashboardHref = () => {
+    if (!user?.onboardingComplete) {
+      if (user?.onboardingIntent) return `/onboarding/${user.onboardingIntent}/start`;
+      return "/onboarding/choose-path";
+    }
+    return "/dashboard";
   };
 
   return (
@@ -77,10 +94,18 @@ const HeroSection = () => {
               variants={itemVariants}
               className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
             >
-              Smarter Assessments for
-              <span className="block text-primary">
-                Modern Universities
-              </span>
+              {user ? (
+                <>
+                  Welcome back, <span className="text-primary">{user.name?.split(" ")[0]}</span>.
+                </>
+              ) : (
+                <>
+                  Smarter Assessments for
+                  <span className="block text-primary">
+                    Modern Universities
+                  </span>
+                </>
+              )}
             </motion.h1>
             
             <motion.p
@@ -93,35 +118,48 @@ const HeroSection = () => {
               verified academic integrity — all in one system.
             </motion.p>
 
-            {/* --- CTA BUTTONS (UPDATED) --- */}
+            {/* --- CTA BUTTONS --- */}
             <motion.div
               variants={itemVariants}
               className="mt-10 flex flex-col gap-4 sm:flex-row"
             >
-              <Button
-                size="lg"
-                className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:scale-105"
-                asChild
-              >
-                {/* CHANGE 1: Point to signup with student intent */}
-                <Link href="/auth/signup?intent=student">
-                  Get Started as a Student
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              {user ? (
+                <Button
+                  size="lg"
+                  className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:scale-105"
+                  asChild
+                >
+                  <Link href={getDashboardHref()}>
+                    Go to Your Dashboard
+                    <LayoutDashboard className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:scale-105"
+                    asChild
+                  >
+                    <Link href="/auth/signup?intent=student">
+                      Get Started as a Student
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
 
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-12 px-8 text-base"
-                asChild
-              >
-                {/* CHANGE 2: Point to signup with institution intent */}
-                <Link href="/auth/signup?intent=institution">
-                  Register an Institution
-                  <Building2 className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-12 px-8 text-base"
+                    asChild
+                  >
+                    <Link href="/auth/signup?intent=institution">
+                      Register an Institution
+                      <Building2 className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </>
+              )}
             </motion.div>
 
             {/* SOCIAL PROOF */}

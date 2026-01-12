@@ -12,17 +12,21 @@ import CtaSection from "@/components/main/sections/CTA";
 import Footer from "@/components/core/Footer";
 import WhyBrainySection from "@/components/main/sections/why-brainy";
 
+import { validateRequest } from "@/lib/auth";
+
 export const metadata: Metadata = {
   title: "Brainy - Student & Institution Verification Platform",
   description: "Secure, real-time academic verification for students and institutions.",
 };
 
-export default function Home() {
+export default async function Home() {
+  const { user } = await validateRequest();
+
   return (
     <>
-      <Navbar />
+      <Navbar user={user} />
       <main>
-        <HeroSection />
+        <HeroSection user={user} />
         <ClientSection />
         <FeaturesSection />
         <HowItWorksSection />

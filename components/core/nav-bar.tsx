@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Brain, Menu, Sparkle, ChevronDown } from "lucide-react";
+import { Brain, Menu, Sparkle, ChevronDown, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navLinks, type NavItem } from "@/lib/nav";
 import { useScrollSpy, smoothScrollTo } from "@/hooks/use-scroll-spy";
@@ -21,21 +21,34 @@ import {
 import { Wrapper } from "../ui/wrapper";
 import Image from "next/image";
 
-const Navbar = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Renamed for clarity
+import { UserNav } from "./user-nav";
+
+interface NavbarProps {
+  user?: {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+    onboardingIntent: string | null;
+    onboardingComplete: boolean;
+  } | null;
+}
+
+const Navbar = ({ user }: NavbarProps) => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const allIds = navLinks.flatMap(link => [link.href, ...(link.children?.map(c => c.href) || [])]);
   const activeId = useScrollSpy(allIds);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     smoothScrollTo(href);
-    setIsDrawerOpen(false); // Close the drawer on link click
+    setIsDrawerOpen(false);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-transparent backdrop-blur-sm supports-backdrop-filter:bg-background/10">
       <Wrapper className="flex h-16 items-center justify-between">
-        {/* === Left Side (No changes) === */}
+        {/* === Left Side === */}
         <div className="flex items-center gap-6">
           {/* Logo */}
           <Link
@@ -68,15 +81,22 @@ const Navbar = () => {
           </nav>
         </div>
 
-        {/* === Right Side (No changes to desktop) === */}
+        {/* === Right Side === */}
         <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 md:flex">
-            <Button variant="ghost" asChild><Link href="/auth/login">Log in</Link></Button>
-            <Button asChild><Link href="/get-started"><Sparkle className="mr-2 h-4 w-4" />Get Started</Link></Button>
-          </div>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <UserNav user={user} />
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 md:flex">
+              <Button variant="ghost" asChild><Link href="/auth/login">Log in</Link></Button>
+              <Button asChild><Link href="/get-started"><Sparkle className="mr-2 h-4 w-4" />Get Started</Link></Button>
+            </div>
+          )}
 
-          {/* --- 2. REPLACE SHEET WITH DRAWER FOR MOBILE --- */}
-          <div className="md:hidden">
+          {/* Mobile Menu */}
+          <div className="md:hidden flex items-center gap-2">
+            {user && <UserNav user={user} />}
             <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
               <DrawerTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Open main menu">
@@ -115,8 +135,19 @@ const Navbar = () => {
                       ))}
                     </nav>
                     <div className="mt-8 space-y-3 border-t pt-6">
-                      <Button className="w-full" size="lg" asChild><Link href="/get-started"><Sparkle className="mr-2 h-4 w-4" />Get Started</Link></Button>
-                      <Button variant="outline" size="lg" className="w-full" asChild><Link href="/auth/login">Log In</Link></Button>
+                      {user ? (
+                        <Button className="w-full" size="lg" asChild>
+                          <Link href={user.onboardingComplete ? "/dashboard" : "/onboarding/choose-path"}>
+                            <LayoutDashboard className="mr-2 h-4 w-4" />
+                            Go to Dashboard
+                          </Link>
+                        </Button>
+                      ) : (
+                        <>
+                          <Button className="w-full" size="lg" asChild><Link href="/get-started"><Sparkle className="mr-2 h-4 w-4" />Get Started</Link></Button>
+                          <Button variant="outline" size="lg" className="w-full" asChild><Link href="/auth/login">Log In</Link></Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
