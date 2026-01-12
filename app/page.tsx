@@ -1,12 +1,21 @@
-import Navbar from "@/components/core/Navbar";
+// app/page.tsx
+import { Metadata } from "next";
+import Navbar from "@/components/core/nav-bar";
 import HeroSection from "@/components/main/sections/Hero";
 import ClientSection from "@/components/main/sections/Client";
 import FeaturesSection from "@/components/main/sections/Features";
-import HowItWorksSection from "@/components/main/sections/HowItWorks"; // Import the new section
-import ForStudentsSection from "@/components/main/sections/ForStudents";
-import ForTutorsSection from "@/components/main/sections/ForTutors";
+import HowItWorksSection from "@/components/main/sections/how-it-works";
+import AudienceSection from "@/components/main/sections/Audience";
+import InstitutionSystemSection from "@/components/main/sections/institution-system";
+import SecuritySection from "@/components/main/sections/security";
 import CtaSection from "@/components/main/sections/CTA";
 import Footer from "@/components/core/Footer";
+import WhyBrainySection from "@/components/main/sections/why-brainy";
+
+export const metadata: Metadata = {
+  title: "Brainy - Student & Institution Verification Platform",
+  description: "Secure, real-time academic verification for students and institutions.",
+};
 
 export default function Home() {
   return (
@@ -17,8 +26,10 @@ export default function Home() {
         <ClientSection />
         <FeaturesSection />
         <HowItWorksSection />
-        <ForStudentsSection />
-        <ForTutorsSection />
+        <AudienceSection />
+        <InstitutionSystemSection />
+        <SecuritySection />
+        <WhyBrainySection />
         <CtaSection />
       </main>
       <Footer />

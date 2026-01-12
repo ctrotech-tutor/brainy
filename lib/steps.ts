@@ -1,4 +1,4 @@
-import { UserPlus, Brain, Trophy } from "lucide-react";
+import { UserPlus, Network, GraduationCap } from "lucide-react";
 
 // --- Data (defined outside the component) ---
 export type Step = {
@@ -14,32 +14,44 @@ export type Step = {
 export const STEPS: Step[] = [
   {
     id: 1,
-    short: "Account",
-    title: "Create Your Account",
+    short: "Sign Up & Verify",
+    title: "Create Your Account & Verify Institution",
     description:
-      "Sign up quickly with your email. Your Brainy profile is the gateway to registering as a student or managing an institution.",
-    bullets: ["One account, multiple roles", "Secure password & auth"],
-    image: "/images/how-it-works/step1-signupp.webp",
+      "Users create a Networky account. Institutions register and verify their details to ensure authenticity and gain access to dashboards.",
+    bullets: [
+      "Fast email signup",
+      "Institutional verification",
+      "Secure authentication",
+    ],
+    image: "/images/how-it-works/step1-signup.webp",
     icon: UserPlus,
   },
   {
     id: 2,
-    short: "Verify",
-    title: "Verify & Join Your Institution",
+    short: "Assign Roles & Setup",
+    title: "Add Faculties, Departments, and Tutors",
     description:
-      "Verify your institutional email to get full access. Institution admins can invite tutors and configure faculties and departments.",
-    bullets: ["Email OTP verification", "Tutor invitation flow"],
+      "Institution admins organize faculties and departments, assign faculty admins, and invite tutors to manage courses and quizzes.",
+    bullets: [
+      "Create faculties & departments",
+      "Assign admins and tutors",
+      "Set up courses & quizzes",
+    ],
     image: "/images/how-it-works/step2-quiz.webp",
-    icon: Brain,
+    icon: Network,
   },
   {
     id: 3,
-    short: "Learn",
-    title: "Take Smart Quizzes",
+    short: "Engage & Track",
+    title: "Students Take Quizzes & Track Performance",
     description:
-      "Engage with adaptive quizzes, timed exams, and instant feedback designed to reflect real course syllabi.",
-    bullets: ["Randomized questions", "Auto-grading & analytics"],
+      "Students enroll under verified institutions, take quizzes, and monitor their results while tutors and admins track progress.",
+    bullets: [
+      "Student enrollment & verification",
+      "Secure quizzes with instant results",
+      "Analytics, leaderboards, and insights",
+    ],
     image: "/images/how-it-works/step3-dashboard.webp",
-    icon: Trophy,
+    icon: GraduationCap,
   },
 ];

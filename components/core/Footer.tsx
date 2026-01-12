@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Brain, Twitter, Linkedin, Github } from "lucide-react";
 import { Wrapper } from "@/components/ui/wrapper";
+import Image from "next/image";
 
 // Updated and reorganized footer links for a cleaner structure
 const footerLinks = {
@@ -48,9 +49,23 @@ const Footer = () => {
       <Wrapper className="relative z-10">
         {/* Top section: Brand and Socials */}
         <div className="flex flex-col items-center text-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <Brain className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">Brainy</span>
+          <Link
+            href="/"
+            className="flex items-center gap-2 group focus:outline-none overflow-hidden"
+          >
+            <div className="relative h-23 w-23 overflow-hidden rounded-lg">
+              <Image
+                src="/brainy-logo-monochrome.png"
+                alt="Brainy Logo"
+                fill
+                priority
+                className="object-contain transition-transform duration-300 group-hover:scale-110 invert dark:invert-0"
+              />
+            </div>
+
+            <span className="hidden text-lg font-bold bg-linear-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Brainy
+            </span>
           </Link>
           <p className="mt-3 max-w-md text-muted-foreground">
             A smarter way to learn, designed for students and educators who

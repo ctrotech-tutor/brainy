@@ -1,8 +1,13 @@
-// app/not-found.tsx
 import Link from "next/link";
+import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Wrapper } from "@/components/ui/wrapper";
 import { BrokenLinkIcon } from "@/components/icons/BrokenLinkIcon"; // Import our custom icon
+
+export const metadata: Metadata = {
+  title: "Page Not Found",
+  description: "The page you are looking for does not exist.",
+};
 
 export default function NotFound() {
   return (

@@ -1,13 +1,11 @@
 import {
-  Brain,
-  // BookOpen,
-  // LayoutDashboard,
+  ClipboardList,
   BarChart3,
   ShieldCheck,
-  Layers3,
+  Network,
 } from "lucide-react";
 
-// Feature type (unchanged – already good)
+// Feature type (unchanged)
 export type Feature = {
   title: string;
   description: string;
@@ -17,69 +15,52 @@ export type Feature = {
   className?: string;
 };
 
-// Updated features aligned with Brainy platform vision
+// Updated features with shortened descriptions
 export const features: Feature[] = [
   {
-    title: "Smart Assessment Engine",
+    title: "Course-Based Quizzes & Assessments",
     description:
-      "A powerful and flexible quiz engine built for real university assessments, supporting structured exams, continuous assessments, and practice tests.",
-    icon: Brain,
-    sub: [
-      "Timed & auto-submitted quizzes",
-      "Question randomization & pools",
-      "Instant grading & feedback",
-      "Multiple question formats",
-    ],
-    image: "/images/features/smart-quiz.webp",
+      "A powerful quiz engine for university assessments, supporting structured exams, continuous assessments, and practice tests.",
+    icon: ClipboardList,
+    sub: ["Multi-course support", "Timed quizzes with auto-grading"],
+    image: "/images/features/course-coverage.webp",
     className: "md:col-span-2 md:row-span-2",
   },
   {
-    title: "Institution & Course Structure",
+    title: "Institution & Role Management",
     description:
-      "Brainy supports real academic structures — institutions, faculties, departments, and standardized courses like CSC 101, GNS 101, PHY 101, and more.",
-    icon: Layers3,
+      "Organize institutions, faculties, and departments with role-based access for admins, tutors, and students.",
+    icon: Network,
     sub: [
-      "Institution-based setup",
-      "Faculty & department mapping",
-      "General & departmental courses",
+      "Institution verification & registration",
+      "Faculty & department creation",
+      "Role-based dashboards for all users",
     ],
     image: "/images/features/course-coverage.webp",
     className: "md:col-span-2",
   },
-  // {
-  //   title: "Role-Based Dashboards",
-  //   description:
-  //     "Dedicated dashboards tailored for students, tutors, faculty admins, and institution administrators.",
-  //   icon: LayoutDashboard,
-  //   sub: [
-  //     "Student performance tracking",
-  //     "Tutor quiz & course management",
-  //     "Admin oversight & controls",
-  //   ],
-  //   // image: "/images/features/dashboard.webp",
-  // },
   {
-    title: "Verified & Secure Access",
+    title: "Student Engagement & Analytics",
     description:
-      "Ensure academic integrity with institution-based verification and controlled access across the platform.",
-    icon: ShieldCheck,
-    sub: [
-      "Student email verification",
-      "Tutor invitation system",
-      "Institution approval workflow",
-    ],
-    image: "/images/features/verification.webp",
-  },
-  {
-    title: "Insights & Performance Analytics",
-    description:
-      "Turn assessment data into actionable insights for better teaching, learning, and institutional decisions.",
+      "Track student performance with real-time results, progress insights, and competitive leaderboards.",
     icon: BarChart3,
     sub: [
-      "Score breakdowns & trends",
-      "Attempt history & comparisons",
-      "Institution-wide analytics",
+      "Real-time results & progress tracking",
+      "Leaderboards and performance insights",
     ],
     image: "/images/features/analytics.webp",
+    className: "",
+  },
+  {
+    title: "Secure & Verified Platform",
+    description:
+      "Uphold academic integrity with institutional verification, secure authentication, and controlled data access.",
+    icon: ShieldCheck,
+    sub: [
+      "Institutional email verification",
+      "OTP-based student verification",
+      "Secure authentication and data",
+    ],
+    image: "/images/features/security.webp",
   },
 ];

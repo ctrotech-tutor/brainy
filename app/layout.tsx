@@ -1,51 +1,96 @@
+// app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import NextTopLoader from "nextjs-toploader";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider"; // We will create this next
+import { siteConfig } from "@/config/site";
+import { ThemeProvider } from "@/components/theme-provider";
+// import PageTransition from "@/components/page-transition";
 import "./globals.css";
+import { QueryProvider } from "@/components/providers/query-provider";
 
+// --- METADATA & VIEWPORT ---
 export const metadata: Metadata = {
-  // Setting a base URL for consistent social sharing links
-  metadataBase: new URL("https://brainy-quiz-app.com" ), // Replace with your actual domain
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Brainy - Master Your Courses with Smart Quizzes",
-    template: "%s | Brainy",
+    default: `${siteConfig.name} - ${siteConfig.title}`,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Brainy transforms university learning through intelligent assessments, real-time analytics, and personalized feedback.",
+  description: siteConfig.description,
+
+  // SEO
+  applicationName: siteConfig.name,
+  keywords: siteConfig.keywords,
+  authors: [{ name: siteConfig.author, url: siteConfig.url }],
+  creator: siteConfig.author,
+
+  alternates: {
+    canonical: "/",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  // Social Sharing
   openGraph: {
-    title: "Brainy - Master Your Courses with Smart Quizzes",
-    description:
-      "The ultimate quiz platform for students and tutors who demand excellence.",
-    url: "https://brainy-quiz-app.com", // Replace with your actual domain
-    siteName: "Brainy",
+    url: siteConfig.url,
+    type: "website",
+    title: {
+      default: `${siteConfig.name} - ${siteConfig.title}`,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    siteName: siteConfig.name,
     images: [
       {
-        url: "/og-image.png", // An attractive image for social sharing
+        url: siteConfig.ogImage,
         width: 1200,
         height: 630,
+        alt: `Promotional image for ${siteConfig.name}`,
       },
     ],
     locale: "en_US",
-    type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Brainy - Master Your Courses with Smart Quizzes",
-    description:
-      "The ultimate quiz platform for students and tutors who demand excellence.",
-    images: ["/og-image.png"],
+    title: {
+      default: `${siteConfig.name} - ${siteConfig.title}`,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+    creator: siteConfig.twitterHandle,
   },
+
+  // Icons & Manifest
+  icons: {
+    icon: "/brainy-app-icon.png",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: `${siteConfig.url}/site.webmanifest`,
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light )", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#7C79FF" },
+    { media: "(prefers-color-scheme: dark)", color: "#020817" },
   ],
+  colorScheme: "dark light",
 };
 
+// --- ROOT LAYOUT COMPONENT ---
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -53,21 +98,41 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Structured Data for enhanced SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: siteConfig.name,
+              url: siteConfig.url,
+            }),
+          }}
+        />
+      </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-background overflow-x-hidden font-sans antialiased",
           GeistSans.variable,
           GeistMono.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* Top-loading progress bar for instant navigation feedback */}
+            <NextTopLoader color="#7C79FF" height={3} showSpinner={true} />
+
+            {/* Smooth page transitions */}
+            <div>{children}</div>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

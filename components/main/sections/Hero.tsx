@@ -1,10 +1,10 @@
+// components/landing/HeroSection.tsx
 "use client";
 
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import {
   ArrowRight,
-  GraduationCap,
   Star,
   Building2,
   ShieldCheck,
@@ -48,7 +48,7 @@ const HeroSection = () => {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden bg-background py-24 sm:py-32"
+      className="relative w-full overflow-hidden py-24 sm:py-32"
     >
       {/* Background Effects */}
       <div aria-hidden="true" className="absolute inset-0 -z-10">
@@ -82,7 +82,7 @@ const HeroSection = () => {
                 Modern Universities
               </span>
             </motion.h1>
-
+            
             <motion.p
               variants={itemVariants}
               className="mt-6 max-w-xl text-lg text-muted-foreground"
@@ -93,7 +93,7 @@ const HeroSection = () => {
               verified academic integrity — all in one system.
             </motion.p>
 
-            {/* CTA */}
+            {/* --- CTA BUTTONS (UPDATED) --- */}
             <motion.div
               variants={itemVariants}
               className="mt-10 flex flex-col gap-4 sm:flex-row"
@@ -103,7 +103,8 @@ const HeroSection = () => {
                 className="h-12 px-8 text-base shadow-lg shadow-primary/20 hover:scale-105"
                 asChild
               >
-                <Link href="/signup">
+                {/* CHANGE 1: Point to signup with student intent */}
+                <Link href="/auth/signup?intent=student">
                   Get Started as a Student
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -115,7 +116,8 @@ const HeroSection = () => {
                 className="h-12 px-8 text-base"
                 asChild
               >
-                <Link href="/institution/register">
+                {/* CHANGE 2: Point to signup with institution intent */}
+                <Link href="/auth/signup?intent=institution">
                   Register an Institution
                   <Building2 className="ml-2 h-5 w-5" />
                 </Link>

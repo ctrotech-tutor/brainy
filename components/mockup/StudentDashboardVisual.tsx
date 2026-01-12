@@ -25,7 +25,7 @@ const StudentDashboardVisual = () => {
         )}
       >
         {/* Grain overlay (image feel) */}
-        <div className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay bg-[url('/noise.png')]" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay bg-[url('/noise.jpeg')]" />
 
         <div className="p-6 space-y-6">
           {/* Header */}
