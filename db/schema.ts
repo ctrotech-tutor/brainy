@@ -111,40 +111,62 @@ export const questionTypeEnum = pgEnum("question_type", [
 // ------------------------------
 // AUTH & USERS
 // ------------------------------
-export const users = pgTable("users", {
+export const users = pgTable("user", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
   name: text("name"),
   email: text("email").notNull().unique(),
-  hashedPassword: text("hashed_password"),
-  emailVerified: timestamp("email_verified", { withTimezone: true }),
+  emailVerified: timestamp("emailVerified", { mode: "date", withTimezone: true }),
   image: text("image"),
+  hashedPassword: text("hashed_password"), // Custom field for credentials provider
   onboardingIntent: text("onboarding_intent"),
   onboardingComplete: boolean("onboarding_complete").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const sessions = pgTable("sessions", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-});
-
-export const oauthAccounts = pgTable(
-  "oauth_accounts",
+export const accounts = pgTable(
+  "account",
   {
-    providerId: text("provider_id").notNull(),
-    providerUserId: text("provider_user_id").notNull(),
-    userId: text("user_id")
+    userId: text("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("providerAccountId").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.providerId, table.providerUserId] }),
+  (account) => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  })
+);
+
+export const sessions = pgTable("session", {
+  sessionToken: text("sessionToken").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date", withTimezone: true }).notNull(),
+});
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date", withTimezone: true }).notNull(),
+  },
+  (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   })
 );
 
@@ -159,19 +181,6 @@ export const userRoles = pgTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.role] }),
-  })
-);
-
-export const verificationTokens = pgTable(
-  "verification_tokens",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull().unique(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.identifier, table.token] }),
   })
 );
 
@@ -519,7 +528,7 @@ export const tutorInvitations = pgTable("tutor_invitations", {
   token: text("token").notNull().unique(),
   status: invitationStatusEnum("status").default("PENDING").notNull(),
   message: text("message"),
-  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  expires: timestamp("expires", { withTimezone: true }).notNull(),
   institutionId: text("institution_id")
     .notNull()
     .references(() => institutions.id, { onDelete: "cascade" }),
@@ -585,10 +594,9 @@ export const auditLogs = pgTable("audit_logs", {
 // ------------------------------
 export const usersRelations = relations(users, ({ one, many }) => ({
   sessions: many(sessions),
-  oauthAccounts: many(oauthAccounts),
+  accounts: many(accounts),
   roles: many(userRoles),
   authoredQuizzes: many(quizzes),
-  // quizAttempts (many) are reachable via studentProfiles -> quizAttempts; keep this for convenience if needed
   sentInvitations: many(tutorInvitations),
   studentProfile: one(studentProfiles, {
     fields: [users.id],
@@ -600,8 +608,8 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const oauthAccountsRelations = relations(oauthAccounts, ({ one }) => ({
-  user: one(users, { fields: [oauthAccounts.userId], references: [users.id] }),
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }));
 
 export const userRolesRelations = relations(userRoles, ({ one }) => ({

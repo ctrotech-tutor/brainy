@@ -55,13 +55,13 @@ export async function POST(req: NextRequest) {
     // 5. Generate the secure "ticket" token and the user-facing OTP
     const verificationTicket = generateVerificationToken(); // The secure token for the URL
     const otp = generateNumericOTP(6); // The 6-digit code for the user
-    const expiresAt = getVerificationTokenExpiration(15); // 15-minute expiry
+    const expires = getVerificationTokenExpiration(15); // 15-minute expiry
 
     // Store the OTP with the secure ticket as the identifier
     await db.insert(verificationTokens).values({
       identifier: verificationTicket,
       token: otp,
-      expiresAt,
+      expires,
     });
 
     // 6. Send the verification email

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyRequestOrigin } from "lucia";
+import NextAuth from "next-auth";
+import authConfig from "./auth.config";
+
+const { auth } = NextAuth(authConfig);
 
 // ============================================
 // ROUTE DEFINITIONS
@@ -28,75 +31,27 @@ const PROTECTED_ROUTES = [
   "/dashboard",
   "/profile",
   "/settings",
+  "/platform",
   ...ONBOARDING_ROUTES,
 ];
 
-// API routes that don't need CSRF protection
+// API routes that don't need CSRF protection (Auth.js handles its own)
 const API_PUBLIC_ROUTES = [
-  "/api/auth/signup",
-  "/api/auth/login",
-  "/api/auth/verify-email",
-  "/api/auth/forgot-password",
-  "/api/auth/reset-password",
-  "/api/auth/google",
-  "/api/auth/google/callback",
+  "/api/auth", // Catch-all for NextAuth
 ];
-
-// ============================================
-// EDGE-SAFE SESSION PARSER
-// ============================================
-
-function getSessionFromCookie(request: NextRequest) {
-  const raw = request.cookies.get("brainy-session")?.value;
-  if (!raw) return null;
-
-  try {
-    // If JWT or base64 JSON
-    const payload = JSON.parse(atob(raw.split(".")[1] ?? ""));
-    return payload;
-  } catch {
-    // Fallback: treat cookie presence as auth
-    return { authenticated: true };
-  }
-}
 
 // ============================================
 // proxy
 // ============================================
 
-export function proxy(request: NextRequest) {
+export default auth((request) => {
   const { pathname } = request.nextUrl;
+  const session = request.auth; // Auth.js session
 
-  // ============================================
-  // CSRF PROTECTION (API only)
-  // ============================================
-
-  if (request.method !== "GET" && pathname.startsWith("/api/")) {
-    const isPublicApiRoute = API_PUBLIC_ROUTES.some(route =>
-      pathname.startsWith(route)
-    );
-
-    if (!isPublicApiRoute) {
-      const origin = request.headers.get("Origin");
-      const host = request.headers.get("Host");
-
-      if (!origin || !host || !verifyRequestOrigin(origin, [host])) {
-        return NextResponse.json(
-          { error: "Forbidden: Invalid origin" },
-          { status: 403 }
-        );
-      }
-    }
-  }
-
-  // ============================================
-  // SESSION (EDGE-SAFE)
-  // ============================================
-
-  const session = getSessionFromCookie(request);
-  const isAuthenticated = Boolean(session);
-  const roles: string[] = session?.roles ?? [];
-  const onboardingComplete = session?.onboardingComplete ?? true;
+  const isAuthenticated = !!session;
+  const user = session?.user as any;
+  const roles: string[] = user?.roles ?? [];
+  const onboardingComplete = user?.onboardingComplete ?? true;
 
   const isApiRoute = pathname.startsWith("/api/");
   const isHomePage = pathname === "/";
@@ -118,9 +73,9 @@ export function proxy(request: NextRequest) {
   ) {
     let redirectPath = "/onboarding/choose-path";
 
-    if (session?.onboardingIntent === "student") {
+    if (user?.onboardingIntent === "student") {
       redirectPath = "/onboarding/student/start";
-    } else if (session?.onboardingIntent === "institution") {
+    } else if (user?.onboardingIntent === "institution") {
       redirectPath = "/onboarding/institution/start";
     }
 
@@ -188,7 +143,7 @@ export function proxy(request: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 // ============================================
 // CONFIG

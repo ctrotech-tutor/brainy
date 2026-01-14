@@ -72,12 +72,12 @@ export async function POST(req: NextRequest) {
 
     // Generate new token
     const token = generateVerificationToken();
-    const expiresAt = getPasswordResetTokenExpiration();
+    const expires = getPasswordResetTokenExpiration();
 
     await db.insert(verificationTokens).values({
       identifier: resetIdentifier,
       token,
-      expiresAt,
+      expires,
     });
 
     // Send password reset email

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,8 +10,8 @@ import { toast } from "sonner";
 import { CheckCircle2, Loader2, ArrowRight, UserPlus, Mail } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { signIn } from "next-auth/react";
 
 // Import ShadCN Components
 import { Button } from "@/components/ui/button";
@@ -116,8 +116,8 @@ export default function SignupClient() {
   const handleGoogleSignup = () => {
     setIsGoogleLoading(true);
     const intent = searchParams.get("intent");
-    const url = intent ? `/api/auth/google?intent=${intent}` : "/api/auth/google";
-    window.location.href = url;
+    const callbackUrl = intent ? `/onboarding/choose-path?intent=${intent}` : "/onboarding/choose-path";
+    signIn("google", { callbackUrl });
   };
 
   const isLoading = isPending || isGoogleLoading;

@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, verificationTokens, sessions } from "@/db/schema";
 import { hashPassword, isStrongPassword } from "@/lib/utils/auth";
-import { lucia } from "@/lib/auth";
 import { eq, and, gt, like } from "drizzle-orm";
 import { z } from "zod";
 import { cookies } from "next/headers";
@@ -52,7 +51,7 @@ export async function POST(req: NextRequest) {
       .where(
         and(
           eq(verificationTokens.token, token),
-          gt(verificationTokens.expiresAt, new Date())
+          gt(verificationTokens.expires, new Date())
         )
       )
       .limit(1);
@@ -111,23 +110,11 @@ export async function POST(req: NextRequest) {
       .delete(verificationTokens)
       .where(like(verificationTokens.identifier, `reset:${email}`));
 
-    // Create new session
-    const session = await lucia.createSession(updatedUser.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-
-    // Set cookie
-    const cookieStore = await cookies();
-    cookieStore.set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
-
     return NextResponse.json(
       {
         success: true,
-        message: "Password reset successfully",
-        redirectTo: "/dashboard",
+        message: "Password reset successfully. Please sign in.",
+        redirectTo: "/auth/login?reset=true",
       },
       { status: 200 }
     );

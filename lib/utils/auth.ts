@@ -1,8 +1,6 @@
 // src/lib/utils/auth.ts
 import { hash, verify } from "argon2";
-import { generateIdFromEntropySize } from "lucia";
-import { TimeSpan, createDate } from "oslo";
-import { alphabet, generateRandomString } from "oslo/crypto";
+import { randomBytes, randomInt } from "crypto";
 
 // ============================================
 // PASSWORD HASHING
@@ -27,44 +25,52 @@ export async function verifyPassword(
 // TOKEN GENERATION
 // ============================================
 
-export function generateVerificationToken(): string {
-  return generateRandomString(32, alphabet("a-z", "A-Z", "0-9"));
+/**
+ * Generates a random string of a given length using specified characters.
+ */
+function generateRandomString(length: number, alphabet: string): string {
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += alphabet.charAt(randomInt(0, alphabet.length));
+  }
+  return result;
 }
 
-// --- NEW FUNCTION: Generate a numeric OTP ---
+export function generateVerificationToken(): string {
+  const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  return generateRandomString(32, alphabet);
+}
+
 /**
  * Generates a random numeric string of a given length.
  * @param length The desired length of the OTP (e.g., 6).
  * @returns A string of random digits.
  */
 export function generateNumericOTP(length: number): string {
-  return generateRandomString(length, alphabet("0-9"));
+  const alphabet = "0123456789";
+  return generateRandomString(length, alphabet);
 }
 
 export function generateSessionToken(): string {
-  return generateIdFromEntropySize(25);
+  return randomBytes(16).toString("hex"); // roughly 25 characters equivalent entropy
 }
 
 // ============================================
 // TOKEN EXPIRATION
 // ============================================
 
-// --- UPDATED FUNCTION: Allow for custom expiration times ---
 /**
  * Calculates an expiration date for a token.
  * @param minutes The number of minutes from now for the token to expire. Defaults to 1440 (24 hours).
  * @returns A Date object representing the expiration time.
  */
 export function getVerificationTokenExpiration(minutes: number = 1440): Date {
-  if (minutes <= 0) {
-    // Default to 24 hours if a non-positive number is given
-    return createDate(new TimeSpan(24, "h"));
-  }
-  return createDate(new TimeSpan(minutes, "m"));
+  const mins = minutes > 0 ? minutes : 1440;
+  return new Date(Date.now() + mins * 60 * 1000);
 }
 
 export function getPasswordResetTokenExpiration(): Date {
-  return createDate(new TimeSpan(1, "h")); // 1 hour
+  return new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 }
 
 // ============================================
@@ -109,15 +115,11 @@ export function isStrongPassword(password: string): {
 // ============================================
 
 export function generateState(): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  return generateRandomString(32, chars);
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  return generateRandomString(32, alphabet);
 }
 
 export function generateCodeVerifier(): string {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-
-  return generateRandomString(128, chars);
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  return generateRandomString(128, alphabet);
 }

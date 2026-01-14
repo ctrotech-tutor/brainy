@@ -1,7 +1,5 @@
-// app/(platform)/_components/usernav.client.tsx
-"use client";
-
-import { useMutation } from "@tanstack/react-query";
+"use client"
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -27,28 +25,26 @@ import {
   DropdownMenuShortcut,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 
 // This is the type of the user object passed from the server component
 import { UserNavClientProps } from "@/app/(platform)/_types";
 import { getInitials } from "@/lib/utils";
 
-const logoutAction = async () => {
-  const { data } = await axios.post("/api/auth/logout");
-  return data;
-};
+import { signOut } from "next-auth/react";
 
 export function UserNavClient({ user }: UserNavClientProps) {
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const { mutate: logout, isPending: isLoggingOut } = useMutation({
-    mutationFn: logoutAction,
-    onSuccess: () => {
-      router.push("/auth/login");
-      router.refresh();
-    },
-    onError: (error: any) => toast.error(error.message),
-  });
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({ callbackUrl: "/auth/login" });
+    } catch (error) {
+      toast.error("Logout failed");
+      setIsLoggingOut(false);
+    }
+  };
 
   const isPlatformAdmin = user.roles.includes("PLATFORM_ADMIN");
 
@@ -128,7 +124,7 @@ export function UserNavClient({ user }: UserNavClientProps) {
 
         <div className="p-1">
           <DropdownMenuItem
-            onSelect={() => logout()}
+            onSelect={() => handleLogout()}
             disabled={isLoggingOut}
             className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-destructive focus:bg-destructive/10 focus:text-destructive transition-all"
           >

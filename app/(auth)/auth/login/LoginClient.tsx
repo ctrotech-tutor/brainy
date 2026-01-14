@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -8,9 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { toast } from "sonner";
 import { Loader2, Terminal, ArrowRight, ShieldCheck } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 
 // Import ShadCN Components
 import { Button } from "@/components/ui/button";
@@ -53,6 +52,7 @@ function AuthErrorAlert() {
     oauth_failed: "OAuth authentication failed. Please try again.",
     invalid_oauth_state: "Invalid authentication state. Please try again.",
     "Email not verified": "Your email is not verified. Please check your inbox.",
+    CredentialsSignin: "Invalid email or password. Please try again.",
   };
 
   return (
@@ -70,35 +70,42 @@ function AuthErrorAlert() {
 
 export default function LoginClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  const { mutate: login, isPending } = useMutation({
-    mutationFn: async (data: LoginInput) => {
-      const response = await axios.post("/api/auth/login", data);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      toast.success("Welcome back!");
-      router.push(data.redirectTo || "/dashboard");
-      router.refresh();
-    },
-    onError: (error: AxiosError<any>) => {
-      const result = error.response?.data;
-      const errorMessage = result?.error || "Check your credentials and try again.";
-      toast.error(errorMessage);
+  const [isLoading, setIsLoading] = useState(false);
 
-      if (result?.code === "EMAIL_NOT_VERIFIED") {
-        router.push(`/auth/login?error=${encodeURIComponent("Email not verified")}`);
+  const onSubmit = async (data: LoginInput) => {
+    setIsLoading(true);
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Invalid email or password");
+      } else {
+        toast.success("Welcome back!");
+        const from = searchParams.get("from") || "/dashboard";
+        router.push(from);
+        router.refresh();
       }
+    } catch (error) {
+      toast.error("Sign in failed");
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
-  const onSubmit = (data: LoginInput) => {
-    login(data);
+  const handleGoogleLogin = () => {
+    const from = searchParams.get("from") || "/dashboard";
+    signIn("google", { callbackUrl: from });
   };
 
   return (
@@ -130,7 +137,7 @@ export default function LoginClient() {
       </Suspense>
 
       <div className="space-y-6">
-        <GoogleButton onClick={() => (window.location.href = "/api/auth/google")} disabled={isPending} />
+        <GoogleButton onClick={handleGoogleLogin} disabled={isLoading} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -187,10 +194,10 @@ export default function LoginClient() {
             />
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={isLoading}
               className="group h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:shadow-primary/40 hover:scale-[1.02] active:scale-95"
             >
-              {isPending ? (
+              {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>

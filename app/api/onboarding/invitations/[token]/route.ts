@@ -45,7 +45,7 @@ export async function GET(
       );
     }
 
-    if (new Date(invitationDetails.expiresAt) < new Date()) {
+    if (new Date(invitationDetails.expires) < new Date()) {
       return NextResponse.json(
         { error: "This invitation has expired.", status: "EXPIRED" },
         { status: 410 }
@@ -60,7 +60,7 @@ export async function GET(
         invitationDetails.inviter?.name ??
         invitationDetails.inviter?.email ??
         "Brainy Admin",
-      expiresAt: invitationDetails.expiresAt,
+      expiresAt: invitationDetails.expires,
       status: invitationDetails.status,
     });
   } catch (error) {

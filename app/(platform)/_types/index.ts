@@ -7,6 +7,8 @@ export type UserSession = {
   email: string;
   image: string | null;
   roles: string[];
+  onboardingIntent: string | null;
+  onboardingComplete: boolean;
 };
 
 export type UserProfileData = {
@@ -90,8 +92,6 @@ export type UserTableData = {
 };
 
 // --- CLIENT COMPONENTS ---
-import type { User } from "lucia";
-
 export interface UserNavClientProps {
-  user: User & { roles: string[] };
+  user: UserSession;
 }

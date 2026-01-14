@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, verificationTokens } from "@/db/schema";
-import { lucia } from "@/lib/auth";
 import { eq, and, gt } from "drizzle-orm";
 import { z } from "zod";
 import { cookies } from "next/headers";
@@ -43,7 +42,7 @@ export async function POST(req: NextRequest) {
       .where(
         and(
           eq(verificationTokens.token, token),
-          gt(verificationTokens.expiresAt, new Date())
+          gt(verificationTokens.expires, new Date())
         )
       )
       .limit(1);
@@ -70,44 +69,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Update user's email verification status (set to current timestamp)
-    const [updatedUser] = await db
+    await db
       .update(users)
       .set({ 
         emailVerified: new Date(),
         updatedAt: new Date() 
       })
-      .where(eq(users.id, user.id))
-      .returning();
-
-    if (!updatedUser) {
-      return NextResponse.json(
-        { error: "Failed to verify email" },
-        { status: 500 }
-      );
-    }
+      .where(eq(users.id, user.id));
 
     // Delete used token
     await db
       .delete(verificationTokens)
       .where(eq(verificationTokens.identifier, verificationToken.identifier));
 
-    // Create session for the user
-    const session = await lucia.createSession(updatedUser.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-
-    // Set cookie
-    const cookieStore = await cookies();
-    cookieStore.set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
-
     return NextResponse.json(
       {
         success: true,
-        message: "Email verified successfully",
-        redirectTo: updatedUser.onboardingComplete ? "/dashboard" : "/onboarding",
+        message: "Email verified successfully. Please sign in.",
+        redirectTo: "/auth/login?verified=true",
       },
       { status: 200 }
     );
@@ -165,12 +144,12 @@ export async function PUT(req: NextRequest) {
 
     // Generate new token
     const token = generateVerificationToken();
-    const expiresAt = getVerificationTokenExpiration();
+    const expires = getVerificationTokenExpiration();
 
     await db.insert(verificationTokens).values({
       identifier: user.email,
       token,
-      expiresAt,
+      expires,
     });
 
     // Send email

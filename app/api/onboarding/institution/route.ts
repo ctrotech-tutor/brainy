@@ -69,13 +69,13 @@ export async function POST(req: NextRequest) {
 
     const verificationAttemptToken = generateVerificationToken();
     const otp = generateNumericOTP(6);
-    const expiresAt = getVerificationTokenExpiration(15);
+    const expires = getVerificationTokenExpiration(15);
     const identifier = verificationAttemptToken;
 
     await db.insert(verificationTokens).values({
       identifier,
       token: otp,
-      expiresAt,
+      expires,
     });
 
     await sendInstitutionVerificationEmail(adminEmail, otp, name);

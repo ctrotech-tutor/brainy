@@ -1,8 +1,8 @@
 // app/api/platform/users/[id]/suspend/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { users, auditLogs } from "@/db/schema";
-import { requireAuth, lucia } from "@/lib/auth";
+import { users, auditLogs, sessions } from "@/db/schema";
+import { requireAuth } from "@/lib/auth";
 import { RoleGuard } from "@/lib/utils/roles";
 import { eq } from "drizzle-orm";
 
@@ -12,6 +12,8 @@ export async function POST(req: NextRequest,
   try {
     // --- 1. Authorization ---
     const { user: adminUser } = await requireAuth();
+    if (!adminUser?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
     await RoleGuard.requireRole(adminUser.id, "PLATFORM_ADMIN");
 
     // --- 2. Get Target User ID ---
@@ -43,12 +45,8 @@ export async function POST(req: NextRequest,
     }
 
     // --- 4. Perform the Action ---
-    // Invalidate all sessions for this user
-    await lucia.invalidateUserSessions(targetUserId);
-
-    // Note: A more robust implementation would also set a `status: 'SUSPENDED'`
-    // on the user record and check this status in the middleware.
-    // For now, invalidating sessions is a strong first step.
+    // Invalidate all sessions for this user in the database
+    await db.delete(sessions).where(eq(sessions.userId, targetUserId));
 
     // --- 5. Create Audit Log ---
     await db.insert(auditLogs).values({

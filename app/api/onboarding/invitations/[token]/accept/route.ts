@@ -24,7 +24,7 @@ export async function POST(
         and(
           eq(tutorInvitations.token, token),
           eq(tutorInvitations.status, "PENDING"),
-          gt(tutorInvitations.expiresAt, new Date())
+          gt(tutorInvitations.expires, new Date())
         )
       )
       .limit(1);

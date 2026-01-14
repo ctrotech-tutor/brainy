@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       and(
         eq(verificationTokens.identifier, identifier),
         eq(verificationTokens.token, otp), // Check if the OTP matches
-        gt(verificationTokens.expiresAt, new Date()) // Check if it's not expired
+        gt(verificationTokens.expires, new Date()) // Check if it's not expired
       )
     ).limit(1);
 
@@ -100,14 +100,14 @@ export async function PUT(req: NextRequest) {
     }
 
     const otp = generateNumericOTP(6);
-    const expiresAt = getVerificationTokenExpiration(15);
+    const expires = getVerificationTokenExpiration(15);
     
     // Use the provided "ticket" token as the identifier
     const identifier = token;
 
     // Delete old OTPs for this identifier (ticket) and store the new one
     await db.delete(verificationTokens).where(eq(verificationTokens.identifier, identifier));
-    await db.insert(verificationTokens).values({ identifier, token: otp, expiresAt });
+    await db.insert(verificationTokens).values({ identifier, token: otp, expires });
 
     // Send the new OTP email
     await sendStudentVerificationOTP(profile.institutionalEmail, otp, profile.institution.name);

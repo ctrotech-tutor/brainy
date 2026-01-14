@@ -82,12 +82,12 @@ export async function POST(req: NextRequest) {
 
     // Generate verification token
     const token = generateVerificationToken();
-    const expiresAt = getVerificationTokenExpiration();
+    const expires = getVerificationTokenExpiration();
 
     await db.insert(verificationTokens).values({
       identifier: newUser.email,
       token,
-      expiresAt,
+      expires,
     });
 
     // --- CHANGE 5: Dynamically determine the redirect URL for the email ---

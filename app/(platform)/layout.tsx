@@ -24,7 +24,7 @@ export default async function PlatformAdminLayout({
     redirect('/auth/login');
   }
 
-  const isPlatformAdmin = await hasRole(user.id, 'PLATFORM_ADMIN');
+  const isPlatformAdmin = await hasRole(user.id!, 'PLATFORM_ADMIN');
 
   if (!isPlatformAdmin) {
     redirect('/unauthorized');

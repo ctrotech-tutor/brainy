@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       and(
         eq(verificationTokens.identifier, identifier),
         eq(verificationTokens.token, otp),
-        gt(verificationTokens.expiresAt, new Date())
+        gt(verificationTokens.expires, new Date())
       )
     ).limit(1);
 

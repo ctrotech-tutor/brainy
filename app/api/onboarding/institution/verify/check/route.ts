@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const [otpRecord] = await db.select().from(verificationTokens).where(
       and(
         eq(verificationTokens.identifier, token),
-        gt(verificationTokens.expiresAt, new Date())
+        gt(verificationTokens.expires, new Date())
       )
     ).limit(1);
 

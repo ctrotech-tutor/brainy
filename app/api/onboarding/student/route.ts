@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     // --- Generate and store OTP ---
     const otp = generateNumericOTP(6);
-    const expiresAt = getVerificationTokenExpiration(15); // 15 minutes
+    const expires = getVerificationTokenExpiration(15); // 15 minutes
 
     const identifier = verificationAttemptToken;
     
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     await db.insert(verificationTokens).values({
       identifier,
       token: otp,
-      expiresAt,
+      expires,
     });
 
     // Send OTP email

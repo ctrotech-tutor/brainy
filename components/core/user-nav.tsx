@@ -1,15 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
-import { 
-  LogOut, 
-  User, 
-  LayoutDashboard, 
-  Settings, 
-  CreditCard 
+import {
+  LogOut,
+  User,
+  LayoutDashboard,
+  Settings,
+  CreditCard
 } from "lucide-react";
 
 import {
@@ -34,22 +32,22 @@ interface UserNavProps {
   };
 }
 
+import { signOut } from "next-auth/react";
+import { useState } from "react";
+
 export function UserNav({ user }: UserNavProps) {
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutate: logout, isPending } = useMutation({
-    mutationFn: async () => {
-      await axios.post("/api/auth/logout");
-    },
-    onSuccess: () => {
-      toast.success("Logged out successfully");
-      router.refresh();
-      router.push("/");
-    },
-    onError: () => {
+  const handleLogout = async () => {
+    setIsPending(true);
+    try {
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
       toast.error("Logout failed. Please try again.");
-    },
-  });
+      setIsPending(false);
+    }
+  };
 
   const getDashboardHref = () => {
     if (!user.onboardingComplete) {
@@ -61,10 +59,10 @@ export function UserNav({ user }: UserNavProps) {
 
   const initials = user.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
     : user.email?.charAt(0).toUpperCase() || "U";
 
   return (
@@ -102,8 +100,8 @@ export function UserNav({ user }: UserNavProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          onClick={() => logout()} 
+        <DropdownMenuItem
+          onClick={handleLogout}
           disabled={isPending}
           className="text-destructive focus:bg-destructive/10 focus:text-destructive"
         >
