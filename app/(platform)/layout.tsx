@@ -5,6 +5,7 @@ import { AdminSidebar } from "./_components/sidebar";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { hasRole } from "@/lib/utils/roles";
+import { BackgroundDecor } from "@/components/core/background-decor";
 
 export const metadata: Metadata = {
   title: "Platform Administration - Brainy",
@@ -30,18 +31,22 @@ export default async function PlatformAdminLayout({
   }
 
   return (
-    <div className="min-h-screen w-full bg-muted/40">
+    <div className="relative min-h-screen w-full bg-background overflow-hidden">
+      <BackgroundDecor variant="emerald" />
+
       {/* The Sidebar component will live on the left */}
       <AdminSidebar />
-      
+
       {/* Main content area, with a left margin to account for the sidebar */}
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+      <div className="relative z-10 flex flex-col sm:gap-4 sm:py-4 sm:pl-14 min-h-screen">
         {/* The Header component will live at the top of the main content */}
-        <AdminHeader/>
-        
+        <AdminHeader />
+
         {/* The actual page content will be rendered here */}
         <main className="flex-1 p-4 sm:px-6 sm:py-0">
-          {children}
+          <div className="h-full w-full rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-3xl shadow-2xl p-6 sm:p-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>

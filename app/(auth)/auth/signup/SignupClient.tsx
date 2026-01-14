@@ -1,4 +1,3 @@
-// app/(auth)/auth/signup/SignupClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -8,10 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signupSchema, type SignupInput } from "@/lib/validations/auth";
 import { toast } from "sonner";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, ArrowRight, UserPlus, Mail } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Import ShadCN Components
 import { Button } from "@/components/ui/button";
@@ -24,62 +24,63 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { AuthBrandingPanel } from "../../auth-layout";
 
-// A custom component for the Google button to keep the main component clean
 const GoogleButton = ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
   <Button
     variant="outline"
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="w-full"
+    className="h-12 w-full rounded-2xl border-white/10 bg-white/5 font-bold transition-all hover:bg-white/10 hover:shadow-lg active:scale-[0.98]"
   >
-    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-      <path
-        fill="#4285F4"
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-      />
+    <svg className="mr-3 h-4 w-4" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
     </svg>
     Continue with Google
   </Button>
 );
 
-// A custom component for the success state
 const SuccessState = () => {
   const router = useRouter();
   return (
-    <div className="flex flex-col items-center justify-center text-center space-y-6">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/20 text-success">
-        <CheckCircle2 className="h-8 w-8" />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center text-center space-y-8 p-8 rounded-[3rem] bg-card/30 border border-white/5 backdrop-blur-xl shadow-2xl"
+    >
+      <div className="relative">
+        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20">
+          <Mail className="h-10 w-10" />
+        </div>
       </div>
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Check Your Email!</h2>
-        <p className="text-muted-foreground max-w-sm">
-          We&apos;ve sent a verification link to your email. Please click the link to complete your registration.
+
+      <div className="space-y-3">
+        <h2 className="text-3xl font-black tracking-tighter text-foreground leading-none">
+          Verify Your <span className="text-primary">Identity.</span>
+        </h2>
+        <p className="text-sm font-medium text-muted-foreground leading-relaxed max-w-[280px] mx-auto">
+          We&apos;ve sent a cryptographic verification link to your inbox. Please secure your account by clicking it.
         </p>
       </div>
-      <div className="w-full rounded-lg bg-accent p-4 border border-border">
-        <p className="text-sm text-accent-foreground">
-          <strong>Note:</strong> The link expires in 24 hours. If you don&apos;t see it, check your spam folder.
-        </p>
+
+      <div className="w-full space-y-4 pt-4 border-t border-white/5">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/2 border border-white/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 text-left">
+          <CheckCircle2 className="h-4 w-4 text-primary" />
+          Link expires in 24 hours
+        </div>
+
+        <Button
+          onClick={() => router.push("/auth/login")}
+          className="w-full h-14 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:shadow-primary/40 hover:scale-[1.02]"
+        >
+          Go to Login
+        </Button>
       </div>
-      <Button onClick={() => router.push("/auth/login")} className="w-full">
-        Go to Login
-      </Button>
-    </div>
+    </motion.div>
   );
 };
 
@@ -90,15 +91,10 @@ export default function SignupClient() {
 
   const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  const {mutate: signup, isPending} = useMutation({
+  const { mutate: signup, isPending } = useMutation({
     mutationFn: async (data: SignupInput) => {
       const intent = searchParams.get("intent");
       const url = intent ? `/api/auth/signup?intent=${intent}` : "/api/auth/signup";
@@ -106,7 +102,7 @@ export default function SignupClient() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Account created! Check your email to verify.");
+      toast.success("Account initialized!");
       setShowSuccess(true);
     },
     onError: (error: AxiosError<any>) => {
@@ -115,12 +111,9 @@ export default function SignupClient() {
     }
   });
 
-  const onSubmit = (data: SignupInput) => {
-    signup(data);
-  };
+  const onSubmit = (data: SignupInput) => signup(data);
 
   const handleGoogleSignup = () => {
-    // This can be a loading state while redirecting
     setIsGoogleLoading(true);
     const intent = searchParams.get("intent");
     const url = intent ? `/api/auth/google?intent=${intent}` : "/api/auth/google";
@@ -130,36 +123,44 @@ export default function SignupClient() {
   const isLoading = isPending || isGoogleLoading;
 
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <AuthBrandingPanel />
-
-      {/* Right Panel: Form */}
-      <div className="flex items-center justify-center p-6 sm:p-12">
-        {showSuccess ? (
-          <SuccessState />
-        ) : (
-          <div className="w-full max-w-md space-y-6">
-            <div className="text-center lg:text-left">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">
-                Create an Account
-              </h1>
-              <p className="mt-2 text-muted-foreground">
-                Already have an account?{" "}
-                <Link href="/auth/login" className="text-primary hover:underline font-medium">
-                  Sign In
-                </Link>
-              </p>
+    <AnimatePresence mode="wait">
+      {showSuccess ? (
+        <SuccessState key="success" />
+      ) : (
+        <motion.div
+          key="form"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="space-y-8"
+        >
+          {/* Header */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px]">
+              <UserPlus className="h-3 w-3" />
+              Join the Hub
             </div>
+            <h1 className="text-4xl font-black tracking-tighter text-foreground leading-none">
+              Create <span className="text-primary">Account.</span>
+            </h1>
+            <p className="text-sm font-medium text-muted-foreground">
+              Returning to the standard?{" "}
+              <Link href="/auth/login" className="text-foreground underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-all">
+                Sign in here
+              </Link>
+            </p>
+          </div>
 
+          <div className="space-y-6">
             <GoogleButton onClick={handleGoogleSignup} disabled={isLoading} />
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
+                <span className="w-full border-t border-white/5" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with email
+              <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
+                <span className="bg-background px-4 text-muted-foreground/50">
+                  Or initialize manually
                 </span>
               </div>
             </div>
@@ -170,12 +171,16 @@ export default function SignupClient() {
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input
+                          placeholder="Your identity"
+                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[10px] font-bold" />
                     </FormItem>
                   )}
                 />
@@ -183,12 +188,17 @@ export default function SignupClient() {
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="you@example.com" {...field} />
+                        <Input
+                          type="email"
+                          placeholder="you@institution.edu"
+                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[10px] font-bold" />
                     </FormItem>
                   )}
                 />
@@ -196,12 +206,17 @@ export default function SignupClient() {
                   control={form.control}
                   name="password"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[10px] font-bold" />
                     </FormItem>
                   )}
                 />
@@ -209,36 +224,47 @@ export default function SignupClient() {
                   control={form.control}
                   name="confirmPassword"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                    <FormItem className="space-y-1.5">
+                      <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Confirm</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[10px] font-bold" />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={isLoading} className="w-full">
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isLoading ? "Creating Account..." : "Create Account"}
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group h-14 w-full rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:shadow-primary/40 hover:scale-[1.02] active:scale-95"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      Create Account
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
                 </Button>
               </form>
             </Form>
 
-            <p className="px-8 text-center text-sm text-muted-foreground">
-              By creating an account, you agree to our{" "}
-              <Link href="/terms" className="underline hover:text-primary">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="underline hover:text-primary">
-                Privacy Policy
-              </Link>
+            <p className="px-8 text-center text-[10px] font-bold text-muted-foreground/40 leading-relaxed uppercase tracking-widest">
+              By initializing, you agree to our{" "}
+              <Link href="/terms" className="text-primary/60 hover:text-primary underline decoration-primary/20">Terms</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="text-primary/60 hover:text-primary underline decoration-primary/20">Privacy</Link>
               .
             </p>
           </div>
-        )}
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -1,8 +1,7 @@
-// app/(auth)/verify-email/page.tsx
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthBrandingPanel } from "../../auth-layout";
 import { VerifyEmailClient } from "./VerifyEmailClient";
+import { Loader2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Verify Email",
@@ -11,14 +10,15 @@ export const metadata: Metadata = {
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      <AuthBrandingPanel />
-      <div className="flex items-center justify-center p-6 sm:p-12">
-        {/* Suspense is crucial here for the client component that uses searchParams */}
-        <Suspense fallback={<div>Loading...</div>}>
-          <VerifyEmailClient />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense
+      fallback={
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Verifying...</span>
+        </div>
+      }
+    >
+      <VerifyEmailClient />
+    </Suspense>
   );
 }

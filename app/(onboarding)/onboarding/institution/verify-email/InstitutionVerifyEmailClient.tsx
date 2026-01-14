@@ -1,20 +1,19 @@
-// app/(onboarding)/onboarding/institution/verify-email/InstitutionVerifyEmailClient.tsx
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, MailCheck, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Loader2, ShieldCheck, Mail, ArrowLeft, ShieldAlert, Sparkles, RefreshCcw } from "lucide-react";
 import axios from "axios";
 import Link from "next/link";
 import { institutionVerificationSchema, type InstitutionVerificationInput } from "@/lib/validations/institution";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Badge } from "@/components/ui/badge";
+import { motion, AnimatePresence } from "framer-motion";
 
 // --- API Functions ---
 const checkTokenValidity = async (token: string) => {
@@ -32,19 +31,17 @@ const resendInstitutionOtp = async (token: string) => {
   return data;
 };
 
-// The main component that handles the logic and renders different states
 function VerifyInstitutionFormComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const verificationToken = searchParams.get("token");
 
-  // --- Step 1: Validate the token's existence and validity on page load ---
   const { data: tokenValidation, isPending: isCheckingToken, isError } = useQuery({
     queryKey: ["verifyInstitutionToken", verificationToken],
     queryFn: () => checkTokenValidity(verificationToken!),
-    enabled: !!verificationToken, // Only run if the token exists in the URL
-    retry: 1, // Retry once on network error
-    refetchOnWindowFocus: false, // No need to re-check on window focus
+    enabled: !!verificationToken,
+    retry: 1,
+    refetchOnWindowFocus: false,
   });
 
   const form = useForm<InstitutionVerificationInput>({
@@ -52,128 +49,178 @@ function VerifyInstitutionFormComponent() {
     defaultValues: { pin: "", token: verificationToken || "" },
   });
 
-  // --- Step 2: Define mutations for form submission and resending ---
   const { mutate: submitVerification, isPending: isVerifying } = useMutation({
     mutationFn: verifyInstitutionOtp,
     onSuccess: (data) => {
-      toast.success(data.message || "Email verified!");
+      toast.success("Identity Verified: Handshake Complete.");
       router.push(data.redirectTo || "/onboarding/institution/pending-approval");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Invalid code. Please try again.");
+      toast.error(error.response?.data?.error || "Shield Active: Invalid Protocol Code.");
       form.resetField("pin");
     },
   });
 
+  const [isResendSpinning, setIsResendSpinning] = useState(false);
   const { mutate: resendCode, isPending: isResending } = useMutation({
     mutationFn: () => resendInstitutionOtp(verificationToken!),
-    onSuccess: (data) => { toast.info(data.message || "A new code has been sent."); },
-    onError: (error: any) => { toast.error(error.response?.data?.error || "Failed to resend code."); },
+    onMutate: () => setIsResendSpinning(true),
+    onSuccess: (data) => { 
+        toast.info("Resend Protocol: New code transmitted.");
+        setIsResendSpinning(false);
+    },
+    onError: (error: any) => { 
+        toast.error("Signal Failure: Resend blocked.");
+        setIsResendSpinning(false);
+    },
   });
 
   const handleFormSubmit = (data: InstitutionVerificationInput) => {
     submitVerification(data);
   };
 
-  // --- Step 3: Render UI based on the current state ---
-
-  // State 1: Loading/Checking the token
   if (isCheckingToken) {
     return (
-      <div className="flex flex-col items-center justify-center text-center space-y-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground">Verifying your link...</p>
+      <div className="flex flex-col items-center justify-center p-12 text-center space-y-6">
+        <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+            <Loader2 className="h-12 w-12 animate-spin text-primary relative z-10" />
+        </div>
+        <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Validating Link Header</p>
+            <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Awaiting system response...</p>
+        </div>
       </div>
     );
   }
 
-  // State 2: Token is missing, invalid, or expired
   if (!verificationToken || isError || !tokenValidation?.isValid) {
     return (
-      <div className="w-full max-w-md space-y-6 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border-2 border-destructive bg-destructive/10 text-destructive">
-          <ShieldAlert className="h-8 w-8" />
+      <div className="w-full space-y-8 py-8 px-4 text-center">
+        <div className="relative mx-auto h-24 w-24 flex items-center justify-center rounded-[2.5rem] bg-card/30 border border-white/5 backdrop-blur-xl shadow-2xl">
+            <div className="absolute inset-0 bg-destructive/10 blur-xl rounded-full" />
+            <ShieldAlert className="h-10 w-10 text-destructive relative z-10" />
         </div>
-        <div>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground">Invalid or Expired Link</h2>
-          <p className="mt-2 text-muted-foreground">This verification link is invalid or has expired. Please return and try the previous step again.</p>
+        
+        <div className="space-y-3">
+          <h2 className="text-3xl font-black tracking-tighter text-foreground uppercase">Protocol <span className="text-destructive">Terminated.</span></h2>
+          <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-xs mx-auto">
+            This verification link is invalid or has expired. The current registry sequence has been flushed for security.
+          </p>
         </div>
-        <Button size="lg" className="w-full" asChild>
+
+        <Button 
+            className="h-14 w-full max-w-sm rounded-2xl bg-white/5 border border-white/10 font-black uppercase tracking-widest text-[10px] hover:bg-white/10 transition-all text-white" 
+            asChild
+        >
           <Link href="/onboarding/institution/details">
-            <ArrowLeft className="mr-2 h-5 w-5" />
-            Return to Institution Details
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Restart Registry Sequence
           </Link>
         </Button>
       </div>
     );
   }
 
-  // State 3: Token is valid, render the OTP form
   return (
-    <div className="w-full max-w-md space-y-6">
-      <div>
-        <Badge variant="outline">Final Step</Badge>
-        <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground">Verify Your Email</h2>
-        <p className="mt-2 text-muted-foreground">Enter the 6-digit code sent to your official institution email to submit your application for review.</p>
+    <div className="w-full space-y-10">
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px]">
+          <Mail className="h-3.5 w-3.5" />
+          Final Confirmation Node
+        </div>
+        <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground leading-none">
+          Verify <span className="text-primary italic">Identity.</span>
+        </h2>
+        <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-xs mx-auto">
+          Enter the 6-digit security code dispatched to your institutional administrative node.
+        </p>
       </div>
+
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-10">
           <FormField name="token" control={form.control} render={({ field }) => <input type="hidden" {...field} />} />
-          <FormField
-            control={form.control}
-            name="pin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>One-Time Password</FormLabel>
-                <FormControl>
-                  <InputOTP maxLength={6} {...field}>
-                    <InputOTPGroup className="w-full justify-between">
-                      <InputOTPSlot index={0} /><InputOTPSlot index={1} /><InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} /><InputOTPSlot index={4} /><InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </FormControl>
-                <FormDescription>Please enter the 6-digit code from your email.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isVerifying || isResending} className="w-full text-base">
-            {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isVerifying ? "Verify and Submit for Approval" : "Verify and Submit for Approval"}
-          </Button>
+          
+          <div className="flex justify-center">
+            <FormField
+                control={form.control}
+                name="pin"
+                render={({ field }) => (
+                <FormItem className="space-y-6">
+                    <FormControl>
+                    <InputOTP maxLength={6} {...field} className="gap-2">
+                        <InputOTPGroup className="gap-3">
+                            {[0, 1, 2, 3, 4, 5].map((index) => (
+                                <InputOTPSlot 
+                                    key={index}
+                                    index={index} 
+                                    className="h-16 w-12 md:w-14 text-xl font-black bg-card/50 border-white/10 rounded-[1rem] focus:ring-primary/20 backdrop-blur-md"
+                                />
+                            ))}
+                        </InputOTPGroup>
+                    </InputOTP>
+                    </FormControl>
+                    <FormMessage className="text-center text-[10px] font-bold uppercase tracking-widest" />
+                </FormItem>
+                )}
+            />
+          </div>
+
+          <div className="flex flex-col items-center gap-6">
+            <Button 
+                type="submit" 
+                disabled={isVerifying || isResending} 
+                className="h-16 w-full max-w-sm rounded-[1.25rem] bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+                {isVerifying ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                    <>
+                        Authorize & Commit
+                        <ShieldCheck className="ml-2 h-5 w-5" />
+                    </>
+                )}
+            </Button>
+
+            <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+                    <Sparkles className="h-3 w-3" />
+                    Secure Transfer Phase 03
+                </div>
+                
+                <button 
+                    type="button"
+                    onClick={() => resendCode()} 
+                    disabled={isResending || isVerifying}
+                    className="group text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                    <RefreshCcw className={`h - 3.5 w - 3.5 ${ isResendSpinning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500' } `} />
+                    {isResending ? "Transmitting..." : "Resend Protocol Code"}
+                </button>
+            </div>
+          </div>
         </form>
       </Form>
-      <div className="text-center text-sm text-muted-foreground">
-        Didn&apos;t receive a code?{" "}
-        <Button variant="link" className="p-0 h-auto" onClick={() => resendCode()} disabled={isResending || isVerifying}>
-          {isResending ? "Sending..." : "Resend Code"}
-        </Button>
-      </div>
     </div>
   );
 }
 
 export default function InstitutionVerifyEmailClient() {
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      {/* Left Panel */}
-      <div className="relative hidden lg:flex flex-col items-center justify-center bg-muted/40 p-10 text-center">
-        <div className="aurora-bg" />
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border bg-background/50 text-primary">
-            <MailCheck className="h-10 w-10" />
-          </div>
-          <h1 className="text-4xl font-bold tracking-tighter text-foreground">Final Confirmation</h1>
-          <p className="mt-4 max-w-sm text-lg text-foreground/80">This final step confirms your authority to register the institution and submits your application for review.</p>
+    <Suspense fallback={
+        <div className="w-full flex flex-col items-center justify-center p-20 gap-4">
+            <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
+            <div className="h-2 w-32 bg-white/5 rounded-full overflow-hidden">
+                <motion.div 
+                    initial={{ x: "-100%" }}
+                    animate={{ x: "100%" }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                    className="h-full w-full bg-primary/20"
+                />
+            </div>
         </div>
-      </div>
-      {/* Right Panel */}
-      <div className="flex w-full items-center justify-center bg-background p-6 sm:p-12">
-        <Suspense fallback={<div className="w-full max-w-md flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
-          <VerifyInstitutionFormComponent />
-        </Suspense>
-      </div>
-    </div>
+    }>
+      <VerifyInstitutionFormComponent />
+    </Suspense>
   );
 }

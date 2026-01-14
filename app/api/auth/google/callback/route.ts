@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     console.log("[Google Auth Callback] Tokens received via validation");
 
     const response = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
-      headers: { Authorization: `Bearer ${tokens.accessToken}` },
+      headers: { Authorization: `Bearer ${tokens.accessToken()}` },
     });
 
     if (!response.ok) {

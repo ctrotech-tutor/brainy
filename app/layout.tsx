@@ -122,12 +122,12 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
             {/* Top-loading progress bar for instant navigation feedback */}
-            <NextTopLoader color="#7C79FF" height={3} showSpinner={true} />
+            <NextTopLoader color="#7C79FF" height={3} showSpinner={false} />
 
             {/* Smooth page transitions */}
             <div>{children}</div>

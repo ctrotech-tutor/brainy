@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Wrapper } from "@/components/ui/wrapper"; // Assuming a layout wrapper component
+import { Wrapper } from "@/components/ui/wrapper";
+import { motion } from "framer-motion";
 
-// --- ENHANCED DATA STRUCTURE ---
-// Includes separate logos for light and dark themes for robust theme handling.
 export const universityLogos = [
   {
     name: "Lagos State University",
@@ -20,7 +19,7 @@ export const universityLogos = [
     name: "University of Ibadan",
     logoLight: "/logos/uii.jpeg",
     logoDark: "/logos/uii-dark.png",
-  }, // Assumes you create a dark version
+  },
   {
     name: "Obafemi Awolowo University",
     logoLight: "/logos/oaulogo.jpg",
@@ -48,67 +47,103 @@ export const universityLogos = [
   },
 ];
 
-/**
- * A modern, theme-aware, and infinitely scrolling client logo section.
- * It pauses on hover and respects user's preference for reduced motion.
- */
+const LogoMarquee = ({ logos, direction = "left", speed = 40 }: { logos: typeof universityLogos, direction?: "left" | "right", speed?: number }) => {
+  return (
+    <div className="flex overflow-hidden select-none gap-10 group mt-10">
+      <motion.div
+        animate={{
+          x: direction === "left" ? ["0%", "-50%"] : ["-50%", "0%"],
+        }}
+        transition={{
+          duration: speed,
+          ease: "linear",
+          repeat: Infinity,
+        }}
+        className="flex flex-nowrap gap-10 min-w-full items-center"
+      >
+        {[...logos, ...logos].map((uni, idx) => (
+          <div
+            key={`${uni.name}-${idx}`}
+            className="flex-shrink-0 relative h-12 w-48 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-500 hover:scale-110"
+          >
+            <Image
+              src={uni.logoLight}
+              alt={uni.name}
+              fill
+              className="object-contain dark:hidden"
+            />
+            <Image
+              src={uni.logoDark || uni.logoLight}
+              alt={uni.name}
+              fill
+              className="object-contain hidden dark:block"
+            />
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
 const ClientSection = () => {
   return (
-    <section id="clients" className="bg-background py-20 sm:py-28">
+    <section id="clients" className="relative bg-background py-24 sm:py-32 overflow-hidden" aria-labelledby="clients-heading">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 h-[600px] w-full bg-primary/5 blur-[120px]" />
+
       <Wrapper>
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Trusted by Leading Universities
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Designed to support standardized assessments across faculties,
-            departments, and institutions.
-          </p>
+        <div className="mx-auto max-w-4xl text-center mb-20 px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-primary mb-6">
+              Institutional Trust
+            </h2>
+            <h3 id="clients-heading" className="text-4xl sm:text-6xl font-black tracking-tighter text-foreground mb-8 leading-[1.1]">
+              Powering the next generation of <span className="prose-italics">Academic Excellence.</span>
+            </h3>
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Brainy is the standardized OS for course evaluations, research
+              verifications, and institutional assessments across leading universities.
+            </p>
+          </motion.div>
         </div>
 
-        {/* The Infinite Scrolling Marquee */}
-        <div
-          className="group relative mt-16 flex gap-x-16 overflow-hidden"
-          style={{
-            maskImage:
-              "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-          }}
-        >
-          {/* We render the scrolling content twice for a seamless loop */}
-          {[...Array(2)].map((_, index) => (
-            <div
-              key={index}
-              className="flex shrink-0 animate-scroll items-center justify-around gap-x-16 group-hover:[animation-play-state:paused] motion-reduce:animate-none"
-            >
-              {universityLogos.map((uni) => (
-                <div
-                  key={uni.name}
-                  className="flex shrink-0 items-center justify-center px-4 py-2"
-                >
-                  {/* --- THEME-AWARE LOGO RENDERING --- */}
-                  <div className="relative h-12 w-40 transition-transform duration-300 ease-in-out hover:scale-110">
-                    {/* Light mode logo: Visible by default, hidden in dark mode */}
-                    <Image
-                      src={uni.logoLight}
-                      alt={`${uni.name} logo`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 160px"
-                      className="object-contain opacity-60 transition-opacity duration-300 hover:opacity-100 dark:hidden"
-                    />
-                    {/* Dark mode logo: Hidden by default, visible in dark mode */}
-                    <Image
-                      src={uni.logoDark}
-                      alt={`${uni.name} logo`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 160px"
-                      className="hidden object-contain opacity-60 transition-opacity duration-300 hover:opacity-100 dark:block"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
+        {/* The Infinite Scrolling Marquees with Dual Directions */}
+        <div className="relative">
+          {/* Top Edge Fade */}
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+
+          <LogoMarquee logos={universityLogos} speed={50} direction="left" />
+          <LogoMarquee logos={universityLogos.slice().reverse()} speed={60} direction="right" />
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.8 }}
+          className="mt-20 flex flex-wrap justify-center items-center gap-x-12 gap-y-6 px-10"
+        >
+          <div className="flex flex-col items-center">
+            <span className="text-3xl font-black text-foreground">50k+</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Active Students</span>
+          </div>
+          <div className="h-8 w-px bg-white/5 hidden sm:block" />
+          <div className="flex flex-col items-center">
+            <span className="text-3xl font-black text-foreground">12+</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Verified Institutions</span>
+          </div>
+          <div className="h-8 w-px bg-white/5 hidden sm:block" />
+          <div className="flex flex-col items-center">
+            <span className="text-3xl font-black text-foreground">100%</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Enrollment Security</span>
+          </div>
+        </motion.div>
       </Wrapper>
     </section>
   );

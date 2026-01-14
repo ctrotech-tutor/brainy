@@ -145,6 +145,31 @@ export async function sendStudentVerificationOTP(
 }
 
 // ============================================
+// NEWSLETTER SUBSCRIPTION NOTIFICATION
+// ============================================
+
+export async function sendNewsletterSubscriptionNotification(
+  subscriberEmail: string
+): Promise<void> {
+  // You might want to add this to your .env.local file
+  const adminEmail = process.env.SMTP_USER;
+
+  try {
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to: adminEmail, // Send the notification to the admin
+      subject: "🎉 New Newsletter Subscriber!",
+      html: getNewsletterSubscriptionTemplate(subscriberEmail),
+    });
+  } catch (error) {
+    console.error("Failed to send newsletter subscription notification:", error);
+    // We throw a generic error to be handled by the API route
+    throw new Error("Failed to send notification email.");
+  }
+}
+
+
+// ============================================
 // EMAIL TEMPLATES
 // ============================================
 
@@ -430,3 +455,27 @@ function getStudentVerificationOTPTemplate(otp: string, institutionName: string)
     </html>
   `;
 }
+
+
+// Add the new template for the newsletter notification
+function getNewsletterSubscriptionTemplate(subscriberEmail: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>New Subscriber</title>
+      </head>
+      <body style="font-family: sans-serif; line-height: 1.6;">
+        <h2>New Newsletter Subscriber</h2>
+        <p>A new user has subscribed to your newsletter:</p>
+        <p><strong>Email:</strong> <a href="mailto:${subscriberEmail}">${subscriberEmail}</a></p>
+        <hr>
+        <p style="font-size: 12px; color: #999;">
+          This notification was sent from the Brainy platform. You can add this email to your mailing list.
+        </p>
+      </body>
+    </html>
+  `;
+}
+

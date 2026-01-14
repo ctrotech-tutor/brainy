@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
         hostname: "images.pexels.com",
         pathname: "/**",
       },
-    ],
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      ],
   },
   // Enable React strict mode for better development experience
   reactStrictMode: true,

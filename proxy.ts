@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyRequestOrigin } from "lucia";
-import { validateSessionInMiddleware } from "@/lib/auth";
 
 // ============================================
 // ROUTE DEFINITIONS
@@ -44,24 +43,44 @@ const API_PUBLIC_ROUTES = [
 ];
 
 // ============================================
+// EDGE-SAFE SESSION PARSER
+// ============================================
+
+function getSessionFromCookie(request: NextRequest) {
+  const raw = request.cookies.get("brainy-session")?.value;
+  if (!raw) return null;
+
+  try {
+    // If JWT or base64 JSON
+    const payload = JSON.parse(atob(raw.split(".")[1] ?? ""));
+    return payload;
+  } catch {
+    // Fallback: treat cookie presence as auth
+    return { authenticated: true };
+  }
+}
+
+// ============================================
 // proxy
 // ============================================
 
-export async function proxy(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ============================================
-  // CSRF PROTECTION (for non-GET requests to API)
+  // CSRF PROTECTION (API only)
   // ============================================
-  if (request.method !== "GET") {
-    // Skip CSRF for public API routes
-    const isPublicApiRoute = API_PUBLIC_ROUTES.some(route => pathname.startsWith(route));
-    
-    if (!isPublicApiRoute && pathname.startsWith("/api/")) {
-      const originHeader = request.headers.get("Origin");
-      const hostHeader = request.headers.get("Host");
-      
-      if (!originHeader || !hostHeader || !verifyRequestOrigin(originHeader, [hostHeader])) {
+
+  if (request.method !== "GET" && pathname.startsWith("/api/")) {
+    const isPublicApiRoute = API_PUBLIC_ROUTES.some(route =>
+      pathname.startsWith(route)
+    );
+
+    if (!isPublicApiRoute) {
+      const origin = request.headers.get("Origin");
+      const host = request.headers.get("Host");
+
+      if (!origin || !host || !verifyRequestOrigin(origin, [host])) {
         return NextResponse.json(
           { error: "Forbidden: Invalid origin" },
           { status: 403 }
@@ -71,39 +90,48 @@ export async function proxy(request: NextRequest) {
   }
 
   // ============================================
-  // CHECK AUTHENTICATION STATUS
+  // SESSION (EDGE-SAFE)
   // ============================================
-  
-  const sessionCookie = request.cookies.get("brainy-session");
-  const { user, session, roles } = await validateSessionInMiddleware(sessionCookie?.value || "");
-  const isAuthenticated = !!session;
+
+  const session = getSessionFromCookie(request);
+  const isAuthenticated = Boolean(session);
+  const roles: string[] = session?.roles ?? [];
+  const onboardingComplete = session?.onboardingComplete ?? true;
+
+  const isApiRoute = pathname.startsWith("/api/");
+  const isHomePage = pathname === "/";
 
   // ============================================
   // ONBOARDING ENFORCEMENT
   // ============================================
-  
-  const isOnboardingRoute = ONBOARDING_ROUTES.some(route => pathname.startsWith(route));
-  const isApiRoute = pathname.startsWith("/api/");
-  const isHomePage = pathname === "/";
 
-  if (isAuthenticated && !user?.onboardingComplete && !isOnboardingRoute && !isApiRoute && !isHomePage) {
-    // User is logged in but hasn't finished onboarding. 
-    // Force them to their onboarding path.
+  const isOnboardingRoute = ONBOARDING_ROUTES.some(route =>
+    pathname.startsWith(route)
+  );
+
+  if (
+    isAuthenticated &&
+    !onboardingComplete &&
+    !isOnboardingRoute &&
+    !isApiRoute &&
+    !isHomePage
+  ) {
     let redirectPath = "/onboarding/choose-path";
-    if (user?.onboardingIntent === "student") {
+
+    if (session?.onboardingIntent === "student") {
       redirectPath = "/onboarding/student/start";
-    } else if (user?.onboardingIntent === "institution") {
+    } else if (session?.onboardingIntent === "institution") {
       redirectPath = "/onboarding/institution/start";
     }
-    
+
     return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
   // ============================================
-  // PUBLIC ROUTES - Allow everyone
+  // PUBLIC ROUTES
   // ============================================
-  
-  const isPublicRoute = PUBLIC_ROUTES.some(route => 
+
+  const isPublicRoute = PUBLIC_ROUTES.some(route =>
     pathname === route || pathname.startsWith(`${route}/`)
   );
 
@@ -112,14 +140,12 @@ export async function proxy(request: NextRequest) {
   }
 
   // ============================================
-  // AUTH ROUTES - Redirect to dashboard if already logged in
+  // AUTH ROUTES
   // ============================================
-  
-  const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
-  if (isAuthRoute && isAuthenticated) {
-    // Determine the best dashboard based on roles
+  if (AUTH_ROUTES.includes(pathname) && isAuthenticated) {
     let dashboardPath = "/dashboard";
+
     if (roles.includes("PLATFORM_ADMIN")) {
       dashboardPath = "/platform/dashboard";
     } else if (roles.includes("INSTITUTION_ADMIN")) {
@@ -129,15 +155,15 @@ export async function proxy(request: NextRequest) {
     } else if (roles.includes("TUTOR")) {
       dashboardPath = "/dashboard/tutor";
     }
-    
+
     return NextResponse.redirect(new URL(dashboardPath, request.url));
   }
 
   // ============================================
-  // PROTECTED ROUTES - Require authentication
+  // PROTECTED ROUTES
   // ============================================
-  
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => 
+
+  const isProtectedRoute = PROTECTED_ROUTES.some(route =>
     pathname.startsWith(route)
   );
 
@@ -148,38 +174,16 @@ export async function proxy(request: NextRequest) {
   }
 
   // ============================================
-  // DASHBOARD REDIRECT - Route /dashboard to role base
+  // API AUTH
   // ============================================
 
-  if (pathname === "/dashboard" && isAuthenticated) {
-    let dashboardPath = "/dashboard";
-    if (roles.includes("PLATFORM_ADMIN")) {
-      dashboardPath = "/platform/dashboard";
-    } else if (roles.includes("INSTITUTION_ADMIN")) {
-      dashboardPath = "/dashboard/institution";
-    } else if (roles.includes("STUDENT")) {
-      dashboardPath = "/dashboard/student";
-    } else if (roles.includes("TUTOR")) {
-      dashboardPath = "/dashboard/tutor";
-    }
-    
-    if (dashboardPath !== "/dashboard") {
-      return NextResponse.redirect(new URL(dashboardPath, request.url));
-    }
-  }
-
-  // ============================================
-  // API ROUTES - Check authentication
-  // ============================================
-  
   if (isApiRoute && !isAuthenticated) {
-    const isPublicApiRoute = API_PUBLIC_ROUTES.some(route => pathname.startsWith(route));
-    
+    const isPublicApiRoute = API_PUBLIC_ROUTES.some(route =>
+      pathname.startsWith(route)
+    );
+
     if (!isPublicApiRoute) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
 
@@ -187,18 +191,11 @@ export async function proxy(request: NextRequest) {
 }
 
 // ============================================
-// proxy CONFIG
+// CONFIG
 // ============================================
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (public folder)
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

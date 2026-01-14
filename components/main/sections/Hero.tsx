@@ -65,10 +65,10 @@ const HeroSection = ({ user }: HeroSectionProps) => {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden py-24 sm:py-32"
+      className="relative w-full overflow-x-clip py-24 sm:py-32"
     >
       {/* Background Effects */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10">
+      <div aria-hidden="true" className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-secondary/10" />
         <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl animate-blob" />
         <div className="animation-delay-4000 absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-accent/10 blur-3xl animate-blob" />

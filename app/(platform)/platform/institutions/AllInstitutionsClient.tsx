@@ -6,6 +6,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { columns } from "./_components/columns";
 import { DataTable } from "../institutions/pending/_components/data-table"; // Re-using the same data-table
 import { Skeleton } from "@/components/ui/skeleton";
+import { Building2, Filter } from "lucide-react";
 
 // UI Imports for the filter
 import {
@@ -39,19 +40,26 @@ function StatusFilter() {
   };
 
   return (
-    <Select value={currentStatus} onValueChange={handleStatusChange}>
-      <SelectTrigger className="w-48">
-        <SelectValue placeholder="Filter by status..." />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="all">All Statuses</SelectItem>
-        {institutionStatusEnum.enumValues.map((status) => (
-          <SelectItem key={status} value={status} className="capitalize">
-            {status.replace("_", " ").toLowerCase()}
+    <div className="relative group">
+      <Select value={currentStatus} onValueChange={handleStatusChange}>
+        <SelectTrigger className="w-56 rounded-xl border-white/5 bg-white/5 backdrop-blur-md text-[10px] font-black uppercase tracking-widest h-10 px-4 focus:ring-primary/20 transition-all">
+          <div className="flex items-center gap-2">
+            <Filter className="h-3.5 w-3.5 opacity-40" />
+            <SelectValue placeholder="System Filter..." />
+          </div>
+        </SelectTrigger>
+        <SelectContent className="border-white/10 bg-black/60 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl">
+          <SelectItem value="all" className="rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-white/5">
+            Full Spectrum
           </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+          {institutionStatusEnum.enumValues.map((status) => (
+            <SelectItem key={status} value={status} className="capitalize rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-white/5">
+              {status.replace("_", " ").toLowerCase()}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -68,25 +76,31 @@ export default function AllInstitutionsClient() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">All Institutions</h1>
-          <p className="text-muted-foreground">
-            Manage all institutions on the platform.
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px]">
+            <Building2 className="h-3 w-3" />
+            Infrastructure Registry
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground leading-none">
+            All <span className="text-primary italic">Institutions.</span>
+          </h1>
+          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
+            Global orchestration and parameter management for all connected academic nodes.
           </p>
         </div>
         <StatusFilter />
       </div>
 
-      <Suspense fallback={<Skeleton className="h-125 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-white/5" />}>
         <DataTable
           columns={columns}
           apiEndpoint="/api/platform/institutions"
           queryKey="all-institutions"
           initialParams={initialParams}
           filterColumn="name"
-          filterPlaceholder="Filter by institution name..."
+          filterPlaceholder="Enter Node Identity..."
         />
       </Suspense>
     </div>

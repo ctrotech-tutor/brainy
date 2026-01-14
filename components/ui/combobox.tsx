@@ -27,6 +27,7 @@ export interface ComboboxProps {
   onInputChange?: (search: string) => void;
   // --- NEW PROP ---
   renderNotFound?: React.ReactNode;
+  className?: string;
 }
 
 export function Combobox({
@@ -40,6 +41,7 @@ export function Combobox({
   onInputChange,
   // --- DESTRUCTURE NEW PROP ---
   renderNotFound,
+  className,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   
@@ -56,7 +58,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className=  {cn("w-full justify-between", className)}
           disabled={disabled}
         >
           <span className="truncate">

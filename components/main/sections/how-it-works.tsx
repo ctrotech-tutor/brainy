@@ -1,262 +1,186 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { motion, useMotionValue, useTransform, AnimatePresence, Variants } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import { Wrapper } from "@/components/ui/wrapper";
-import { STEPS } from "@/lib/steps"; // Assuming STEPS data is still valid
-
-const cardVariants: Variants = {
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2, ease: "easeIn" } },
-};
+import { motion, AnimatePresence } from "framer-motion";
+import { STEPS } from "@/lib/steps";
+import {
+  ChevronRight,
+  Sparkles,
+  CheckCircle2,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  LayoutDashboard
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function HowItWorksSection() {
-  const [active, setActive] = useState(0);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-50, 50], [10, -10]);
-  const rotateY = useTransform(x, [-50, 50], [-10, 10]);
+  const [activeStep, setActiveStep] = useState(0);
 
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const anchorRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const announcerRef = useRef<HTMLDivElement | null>(null);
-  const scrollTimeout = useRef<number | null>(null);
-  const touchStartX = useRef<number | null>(null);
-
-  const goTo = useCallback((index: number) => {
-    const clampedIndex = Math.max(0, Math.min(index, STEPS.length - 1));
-    setActive(clampedIndex);
-
-    if (scrollTimeout.current) {
-      window.clearTimeout(scrollTimeout.current);
-    }
-
-    anchorRefs.current[clampedIndex]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-
-    scrollTimeout.current = window.setTimeout(() => {
-      scrollTimeout.current = null;
-    }, 800);
+  // Auto-play steps for a more dynamic feel
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % STEPS.length);
+    }, 6000);
+    return () => clearInterval(timer);
   }, []);
 
-  // --- All hooks for navigation, scroll-spy, etc. remain the same ---
-  // (No changes needed for the useEffect hooks)
-  useEffect(() => {
-    const onScroll = () => {
-      if (scrollTimeout.current) return;
-      const stickyTop = cardRef.current?.getBoundingClientRect().top ?? 0;
-      let bestIdx = 0;
-      let minDistance = Infinity;
-      anchorRefs.current.forEach((el, idx) => {
-        if (!el) return;
-        const dist = Math.abs(el.getBoundingClientRect().top - stickyTop);
-        if (dist < minDistance) {
-          minDistance = dist;
-          bestIdx = idx;
-        }
-      });
-      setActive(bestIdx);
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        window.addEventListener("scroll", onScroll, { passive: true });
-        onScroll();
-      } else {
-        window.removeEventListener("scroll", onScroll);
-      }
-    }, { rootMargin: "-100px 0px -100px 0px" });
-    const currentSectionRef = sectionRef.current;
-    if (currentSectionRef) observer.observe(currentSectionRef);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (currentSectionRef) observer.unobserve(currentSectionRef);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyNav = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") goTo(active + 1);
-      if (e.key === "ArrowLeft") goTo(active - 1);
-    };
-    const onTouchStart = (e: TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const endX = e.changedTouches[0].clientX;
-      const diff = endX - touchStartX.current;
-      if (diff < -40) goTo(active + 1);
-      else if (diff > 40) goTo(active - 1);
-      touchStartX.current = null;
-    };
-    window.addEventListener("keydown", handleKeyNav);
-    const sectionNode = sectionRef.current;
-    sectionNode?.addEventListener("touchstart", onTouchStart, { passive: true });
-    sectionNode?.addEventListener("touchend", onTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener("keydown", handleKeyNav);
-      sectionNode?.removeEventListener("touchstart", onTouchStart);
-      sectionNode?.removeEventListener("touchend", onTouchEnd);
-    };
-  }, [active, goTo]);
-
-  useEffect(() => {
-    if (announcerRef.current) {
-      const s = STEPS[active];
-      announcerRef.current.textContent = `Step ${active + 1}: ${s.title}. ${s.description}`;
-    }
-  }, [active]);
-
-  const activeStep = STEPS[active];
+  const currentStep = STEPS[activeStep];
 
   return (
-    <section id="how-it-works" ref={sectionRef} aria-labelledby="howitworks-heading" className="py-20 bg-linear-to-b from-background to-background/20">
+    <section id="how-it-works" className="relative bg-background py-24 sm:py-32 overflow-hidden" aria-labelledby="how-it-works-heading">
+      {/* Background Decor */}
+      <div className="absolute top-0 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(hsl(var(--foreground)/2%)_1px,transparent_1px)] [background-size:40px_40px] opacity-30" />
+
       <Wrapper>
-        <div className="mx-auto max-w-6xl text-center">
-          <h2 id="howitworks-heading" className="text-3xl sm:text-4xl font-extrabold text-foreground">
-            How Brainy Works — in 3 simple steps
-          </h2>
-          <p className="mt-3 text-lg text-muted-foreground">
-            A compact, trustworthy flow from signup → verification → smarter learning.
-          </p>
+        <div className="mx-auto max-w-4xl text-center mb-24">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest mb-8">
+              <Zap className="h-3 w-3" />
+              Seamless Workflow
+            </div>
+            <h2 id="how-it-works-heading" className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground mb-8 leading-[0.9]">
+              From Signup to <span className="text-primary prose-italics">Mastery.</span>
+            </h2>
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              A high-integrity ecosystem designed for speed, security, and
+              verifiable academic results in three strategic phases.
+            </p>
+          </motion.div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-8 items-start lg:grid-cols-12">
-          <div className="sticky top-28 self-start lg:col-span-4">
-            <nav aria-label="How Brainy steps" className="space-y-6">
-              {STEPS.map((s, idx) => (
-                <button
-                  key={s.id}
-                  onClick={() => goTo(idx)}
-                  className={`group flex w-full items-center gap-4 rounded-xl p-3 transition-all focus:outline-none focus:ring-2 focus:ring-ring ${
-                    idx === active ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-muted"
-                  }`}
-                  aria-current={idx === active ? "step" : undefined}
-                >
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-medium ${
-                      idx === active ? "bg-primary text-primary-foreground" : "bg-card text-foreground border"
-                    }`}
-                    aria-hidden
-                  >
-                    {s.id}
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left: Navigation Steps */}
+          <div className="space-y-6">
+            {STEPS.map((step, idx) => (
+              <button
+                key={step.id}
+                onClick={() => setActiveStep(idx)}
+                className={cn(
+                  "group relative w-full text-left p-8 rounded-[2.5rem] border transition-all duration-500 overflow-hidden",
+                  activeStep === idx
+                    ? "bg-card border-primary/20 shadow-2xl shadow-primary/5"
+                    : "bg-card/20 border-white/5 hover:bg-card/40"
+                )}
+              >
+                {/* Progress highlight */}
+                {activeStep === idx && (
+                  <motion.div
+                    layoutId="active-bg"
+                    className="absolute inset-0 bg-primary/5 -z-10"
+                  />
+                )}
+
+                <div className="flex items-start gap-6">
+                  <div className={cn(
+                    "flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-black text-xl transition-all duration-500",
+                    activeStep === idx
+                      ? "bg-primary text-primary-foreground scale-110 rotate-3"
+                      : "bg-secondary text-muted-foreground group-hover:scale-105"
+                  )}>
+                    0{step.id}
                   </div>
-                  <div className="text-left">
-                    <div className="text-sm font-semibold text-foreground">{s.short}</div>
-                    <div className="text-xs text-muted-foreground">{s.title}</div>
+                  <div>
+                    <h3 className={cn(
+                      "text-xl font-black tracking-tight mb-2 transition-colors",
+                      activeStep === idx ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      {step.short}
+                    </h3>
+                    <p className={cn(
+                      "text-sm leading-relaxed transition-colors line-clamp-2",
+                      activeStep === idx ? "text-muted-foreground" : "text-muted-foreground/40"
+                    )}>
+                      {step.title}
+                    </p>
                   </div>
-                </button>
-              ))}
-            </nav>
-            <div className="mt-6">
-              <div className="h-2 w-full rounded-full bg-secondary">
-                <motion.div
-                  className="h-2 rounded-full bg-primary"
-                  animate={{ width: `${((active + 1) / STEPS.length) * 100}%` }}
-                  transition={{ duration: 0.45, ease: "easeInOut" }}
-                />
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                Step {active + 1} of {STEPS.length}
-              </div>
-            </div>
-            <div className="mt-6 text-sm">
-              <a href="/register" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-primary-foreground shadow hover:scale-[1.02] transition-transform">
-                Get Started
-              </a>
-            </div>
+                </div>
+
+                {activeStep === idx && (
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 6, ease: "linear" }}
+                    className="absolute bottom-0 left-0 h-1 bg-primary/30"
+                  />
+                )}
+              </button>
+            ))}
           </div>
 
-          <div className="relative lg:col-span-8">
-            <div className="sticky top-28 z-20">
+          {/* Right: Visual Showcase */}
+          <div className="relative">
+            <AnimatePresence mode="wait">
               <motion.div
-                ref={cardRef}
-                onPointerMove={(e) => {
-                  const rect = cardRef.current?.getBoundingClientRect();
-                  if (!rect) return;
-                  x.set(((e.clientX - rect.left) / rect.width - 0.5) * 100);
-                  y.set(((e.clientY - rect.top) / rect.height - 0.5) * 100);
-                }}
-                onPointerLeave={() => { x.set(0); y.set(0); }}
-                style={{ rotateX, rotateY, perspective: 1000 }}
-                className="mx-auto w-full max-w-3xl overflow-hidden rounded-3xl bg-linear-to-br from-card to-muted p-6 shadow-2xl"
-                role="region"
-                aria-roledescription="interactive step card"
-                aria-label={`Step ${active + 1} — ${activeStep.title}`}
+                key={activeStep}
+                initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="rounded-[3rem] bg-card/40 border border-white/10 p-10 md:p-16 backdrop-blur-2xl shadow-2xl relative overflow-hidden"
               >
-                <AnimatePresence mode="wait">
-                  <motion.div key={active} variants={cardVariants} initial="initial" animate="animate" exit="exit">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                      <div>
-                        <h3 tabIndex={-1} className="text-lg font-semibold text-foreground outline-none">
-                          {activeStep.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-muted-foreground">{activeStep.description}</p>
+                {/* Decorative glow */}
+                <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl opacity-50" />
 
-                        {activeStep.bullets?.length && (
-                          <ul className="mt-4 space-y-2 text-sm">
-                            {activeStep.bullets.map((b, i) => (
-                              <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                                <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" aria-hidden />
-                                <span>{b}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                      {activeStep === 0 && <ShieldCheck className="h-5 w-5" />}
+                      {activeStep === 1 && <LayoutDashboard className="h-5 w-5" />}
+                      {activeStep === 2 && <Sparkles className="h-5 w-5" />}
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-widest text-primary">Key Phase: 0{activeStep + 1}</span>
+                  </div>
 
-                        <div className="mt-6">
-                          <a href="/signup" className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-primary-foreground shadow hover:scale-[1.02] transition-transform">
-                            Join Now
-                          </a>
+                  <h3 className="text-3xl md:text-4xl font-black tracking-tight text-foreground mb-6 leading-tight">
+                    {currentStep.title}
+                  </h3>
+                  <p className="text-lg text-muted-foreground mb-10 leading-relaxed font-medium">
+                    {currentStep.description}
+                  </p>
+
+                  <div className="grid gap-4 mb-12">
+                    {currentStep.bullets?.map((bullet, idx) => (
+                      <div key={idx} className="flex items-center gap-4 group/bullet">
+                        <div className="h-8 w-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover/bullet:scale-110 transition-transform">
+                          <CheckCircle2 className="h-4 w-4" />
                         </div>
+                        <span className="text-base font-bold text-foreground/80">{bullet}</span>
                       </div>
+                    ))}
+                  </div>
 
-                      <div className="rounded-lg overflow-hidden h-48 md:h-full">
-                        {activeStep.image ? (
-                          <div className="relative h-full w-full">
-                            <Image src={activeStep.image} alt={activeStep.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 40vw" />
-                          </div>
-                        ) : (
-                          // --- UPDATED: Placeholder uses theme variables ---
-                          <div className="flex h-full items-center justify-center bg-secondary text-muted-foreground">No media</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-6 border-t border-border pt-4 text-xs text-muted-foreground flex items-center justify-between">
-                      <div>Secure • Verified • Institution-ready</div>
-                      <div>Estimated time: 2 minutes</div>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
+                  <div className="flex flex-wrap gap-4 pt-8 border-t border-white/5">
+                    <Link
+                      href="/get-started"
+                      className="px-8 py-4 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2"
+                    >
+                      Experience it
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      href="/docs"
+                      className="px-8 py-4 rounded-2xl bg-card border border-white/10 text-muted-foreground font-black uppercase tracking-widest text-xs hover:bg-card/60 transition-all"
+                    >
+                      View Documentation
+                    </Link>
+                  </div>
+                </div>
               </motion.div>
-            </div>
+            </AnimatePresence>
 
-            <div className="mt-8">
-              {STEPS.map((s, idx) => (
-                <div
-                  key={s.id}
-                  ref={(el) => { anchorRefs.current[idx] = el; }}
-                  style={{ minHeight: "70vh", scrollMarginTop: "112px", opacity: 0, pointerEvents: "none" }}
-                />
-              ))}
+            {/* Floaties */}
+            <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-3xl bg-secondary/30 backdrop-blur-xl border border-white/5 flex items-center justify-center -rotate-12 animate-pulse">
+              <span className="text-2xl font-black text-primary">99%</span>
             </div>
-
-            <div className="mt-6 flex items-center justify-center gap-2 lg:hidden">
-              {STEPS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className={`h-2 w-8 rounded-full transition-all ${i === active ? "bg-primary" : "bg-secondary"}`}
-                  aria-label={`Go to step ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <div className="sr-only" aria-live="polite" ref={announcerRef} />
           </div>
         </div>
       </Wrapper>

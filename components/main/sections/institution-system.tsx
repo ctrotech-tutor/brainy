@@ -7,55 +7,78 @@ import { Wrapper } from "@/components/ui/wrapper";
 import { hierarchyData, type HierarchyNode } from "@/lib/hierarchy";
 
 // --- 1. Import the real HierarchyVisual component ---
+import { Badge } from "@/components/ui/badge";
 import { HierarchyVisual } from "./hierarchy-visual";
 
 const InstitutionSystemSection = () => {
   const [selectedNode, setSelectedNode] = useState<HierarchyNode>(hierarchyData);
 
   return (
-    <section className="bg-background py-20 sm:py-28">
+    <section id="institutions" className="relative bg-background py-24 sm:py-32 overflow-hidden" aria-labelledby="institutions-heading">
+      {/* Background decoration */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(hsl(var(--primary)/0.05)_1px,transparent_1px)] [background-size:32px_32px]" />
+
       <Wrapper>
-        {/* Section Header (no changes) */}
+        {/* Section Header */}
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl">
-            Built for Real Institutions
+          <Badge variant="outline" className="mb-4 border-primary/20 bg-primary/5 text-primary">Enterprise Ready</Badge>
+          <h2 id="institutions-heading" className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl md:text-5xl">
+            Streamlined <span className="text-primary">Institution Hierarchy</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            A robust, institution-centric design from the ground up.
+            A flexible, multi-tenant architecture designed to model your entire
+            academic ecosystem from faculties down to individual courses.
           </p>
         </div>
 
-        {/* Main two-column grid (no changes) */}
-        <div className="mt-20 grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-24">
+        {/* Main two-column grid */}
+        <div className="mt-20 grid grid-cols-1 items-start gap-16 lg:grid-cols-2 lg:gap-24">
           {/* Left Column: The Interactive Visual */}
-          <div className="flex items-center justify-center">
-            {/* --- 2. Replace the placeholder with the real component --- */}
-            {/* We pass the data down and provide the onNodeSelect callback function. */}
-            {/* When a node is clicked in the visual, it will call setSelectedNode here. */}
-            <HierarchyVisual data={hierarchyData} onNodeSelect={setSelectedNode} />
+          <div className="flex items-center justify-center lg:sticky lg:top-32">
+            <div className="relative w-full max-w-sm rounded-[2rem] bg-linear-to-b from-primary/5 to-transparent p-1 shadow-2xl">
+              <div className="rounded-[1.9rem] bg-background/80 p-6 backdrop-blur-xl">
+                <HierarchyVisual data={hierarchyData} onNodeSelect={setSelectedNode} />
+              </div>
+            </div>
           </div>
 
-          {/* Right Column: The Content Display (no changes) */}
-          <div className="relative flex min-h-62.5 flex-col justify-center">
+          {/* Right Column: The Content Display */}
+          <div className="relative flex flex-col pt-4 lg:pt-12">
             <AnimatePresence mode="wait">
               <motion.div
                 key={selectedNode.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } }}
-                exit={{ opacity: 0, y: -15, transition: { duration: 0.2, ease: "easeIn" } }}
-                className="flex flex-col"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col gap-6"
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                    <selectedNode.icon className="h-7 w-7 text-primary" />
+                <div className="flex items-center gap-5">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/20">
+                    <selectedNode.icon className="h-8 w-8 text-primary-foreground" />
                   </div>
-                  <h3 className="text-2xl font-bold text-foreground">
-                    {selectedNode.name}
-                  </h3>
+                  <div>
+                    <h3 className="text-3xl font-bold text-foreground">
+                      {selectedNode.name}
+                    </h3>
+                    <div className="h-1 w-12 rounded-full bg-primary/40 mt-1" />
+                  </div>
                 </div>
-                <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+
+                <p className="text-lg leading-relaxed text-muted-foreground md:text-xl">
                   {selectedNode.description}
                 </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div className="rounded-xl border border-border bg-card/50 p-4">
+                    <p className="text-sm font-semibold text-primary">Scalable</p>
+                    <p className="text-xs text-muted-foreground">Deep nesting for any institutional size.</p>
+                  </div>
+                  <div className="rounded-xl border border-border bg-card/50 p-4">
+                    <p className="text-sm font-semibold text-primary">Granular</p>
+                    <p className="text-xs text-muted-foreground">Permission-based access at every level.</p>
+                  </div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>

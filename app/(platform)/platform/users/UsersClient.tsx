@@ -4,33 +4,41 @@
 import { Suspense } from "react";
 import { getColumns } from "./_components/column";
 import { DataTable } from "../institutions/pending/_components/data-table";
-import { EditRolesModal } from "../../_components/edit-roles-modal"; // Import the modal
+import { EditRolesModal } from "../../_components/edit-roles-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Users2, Sparkles } from "lucide-react";
 
 // The main page component for displaying all users
 export default function UsersClient() {
   return (
-    <div>
-      {/* Page Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">All Users</h1>
-          <p className="text-muted-foreground">
-            View and manage all users on the platform.
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px]">
+            <Users2 className="h-3 w-3" />
+            Identity Orchestration
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground leading-none">
+            Users <span className="text-primary italic">Identity.</span>
+          </h1>
+          <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
+            Comprehensive directory management for all institutional actors and administrative personnel.
           </p>
+        </div>
+        <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md">
+          <Sparkles className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Real-time sync</span>
         </div>
       </div>
 
-      {/* Data Table System */}
-      <Suspense fallback={<Skeleton className="h-[500px] w-full" />}>
+      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-white/5" />}>
         <DataTable
-          // --- Configuration for the User Table ---
-          columns={getColumns} // Pass the function directly
-          modalComponent={EditRolesModal} // Tell the table which modal to use
+          columns={getColumns}
+          modalComponent={EditRolesModal}
           apiEndpoint="/api/platform/users"
           queryKey="all-users"
           filterColumn="query"
-          filterPlaceholder="Filter by name or email..."
+          filterPlaceholder="Search Identifiers..."
         />
       </Suspense>
     </div>

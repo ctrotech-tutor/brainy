@@ -62,12 +62,4 @@ export const whyBrainyReasons: Reason[] = [
       "Admins, tutors, and students each get a tailored dashboard and toolset designed specifically for their needs and responsibilities.",
     visual: MultiRoleVisual,
   },
-  {
-    id: "modern-scalable",
-    icon: Scaling,
-    title: "Modern & Inherently Scalable",
-    description:
-      "Built on a modern tech stack, Brainy is fast, responsive, and ready to scale from a single department to an entire university.",
-    visual: ScalableVisual,
-  },
 ];

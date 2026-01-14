@@ -14,7 +14,7 @@ const QuizVisualMockup = () => {
       className="relative w-full max-w-md select-none"
     >
       {/* Ambient Glow */}
-      <div className="absolute -inset-6 rounded-3xl bg-linear-to-tr from-primary/30 via-fuchsia-500/20 to-cyan-400/20 blur-3xl opacity-70" />
+      <div className="absolute -inset-4 rounded-3xl bg-linear-to-tr from-primary/40 via-fuchsia-500/20 to-cyan-400/20 blur-3xl opacity-60" />
 
       {/* Main Visual */}
       <div

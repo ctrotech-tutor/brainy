@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Settings,
   Users,
+  Search,
 } from "lucide-react";
 
 import {
@@ -19,6 +20,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 export function CommandMenu() {
   const router = useRouter();
@@ -45,11 +47,12 @@ export function CommandMenu() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-50 lg:w-84"
+        className="group flex h-10 items-center gap-3 rounded-xl border border-white/5 bg-white/5 px-4 text-xs font-bold uppercase tracking-widest text-muted-foreground/60 transition-all hover:bg-white/10 hover:text-foreground md:w-64 lg:w-80"
       >
-        <span>Search...</span>
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-          <span className="text-xs">⌘</span>K
+        <Search className="h-4 w-4 opacity-50 transition-opacity group-hover:opacity-100" />
+        <span className="flex-1 text-left">Internal Search...</span>
+        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded-[4px] border border-white/10 bg-white/5 px-1.5 font-mono text-[10px] font-black text-muted-foreground/40 opacity-100 sm:flex">
+          <span className="text-[12px]">⌘</span>K
         </kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>

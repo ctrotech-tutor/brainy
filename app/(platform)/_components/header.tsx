@@ -8,6 +8,7 @@ import {
   Settings,
   BookText,
   PanelLeft,
+  Sparkles,
 } from "lucide-react";
 
 // Import our new components
@@ -31,43 +32,53 @@ const navLinks = [
 
 export function AdminHeader() {
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-white/5 bg-transparent px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       {/* --- Mobile Navigation (Sheet) --- */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button size="icon" variant="outline" className="sm:hidden">
+          <Button size="icon" variant="outline" className="sm:hidden border-white/10 bg-white/5 backdrop-blur-md rounded-xl">
             <PanelLeft className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
-          <nav className="grid gap-6 text-lg font-medium">
+        <SheetContent side="left" className="sm:max-w-xs border-r-white/5 bg-black/40 backdrop-blur-2xl p-0">
+          <nav className="flex flex-col h-full py-8 px-4 gap-2">
             <Link
               href="/platform/dashboard"
-              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+              className="group flex h-12 items-center gap-3 rounded-2xl bg-primary px-4 mb-6 shadow-2xl shadow-primary/20 transition-all active:scale-95"
             >
-              <Image src={'/brainy-app-icon.png'} width={20} height={20} alt="Brainy logo"/>
-              <span className="sr-only">Brainy Platform</span>
+              <Image src={'/brainy-app-icon.png'} width={24} height={24} alt="Brainy logo" className="brightness-0 invert" />
+              <span className="text-sm font-black tracking-tighter text-primary-foreground uppercase">Brainy <span className="italic">Platform</span></span>
             </Link>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-              >
-                <link.icon className="h-5 w-5" />
-                {link.label}
-              </Link>
-            ))}
+
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-4 px-4 py-3 text-sm font-bold tracking-tight text-muted-foreground/60 rounded-xl transition-all hover:bg-white/5 hover:text-foreground active:bg-white/10"
+                >
+                  <link.icon className="h-5 w-5" />
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-auto flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Audit Phase 04 Active</span>
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
 
       {/* --- Dynamic Breadcrumb for Desktop --- */}
-      <DynamicBreadcrumb />
+      <div className="hidden sm:block">
+        <DynamicBreadcrumb />
+      </div>
 
       {/* --- Global Search and User Menu --- */}
-      <div className="relative ml-auto flex items-center gap-4 md:grow-0">
+      <div className="relative ml-auto flex items-center gap-3 md:grow-0">
         <CommandMenu />
         <UserNav />
       </div>

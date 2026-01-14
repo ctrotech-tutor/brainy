@@ -8,73 +8,90 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle } from "lucide-react";
-
+import { CheckCircle2, UserCircle, Fingerprint, Calendar, Sparkles, ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { UserProfileData } from "@/app/(platform)/_types";
-
 import { getInitials, formatDate } from "@/lib/utils";
 
-// Helper to get initials from a name
-// (Removed inline implementation)
-
-// A simple component to render a key-value pair
-const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="flex justify-between border-b py-3 last:border-b-0">
-    <dt className="text-sm text-muted-foreground">{label}</dt>
-    <dd className="text-sm font-medium text-foreground">{value}</dd>
+const InfoRow = ({ label, value, icon: Icon }: { label: string; value: React.ReactNode; icon?: React.ElementType }) => (
+  <div className="group flex flex-col gap-1.5 p-4 rounded-2xl border border-white/5 bg-white/[0.02] transition-colors hover:bg-white/[0.05]">
+    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 group-hover:text-primary transition-colors">
+      {Icon && <Icon className="h-3 w-3" />}
+      {label}
+    </div>
+    <div className="text-sm font-bold text-foreground pl-5">
+      {value}
+    </div>
   </div>
 );
 
 export function UserProfileCard({ user }: { user: UserProfileData }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center space-x-4 space-y-0">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={user.image ?? undefined} />
-          <AvatarFallback className="text-xl">{getInitials(user.name)}</AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <CardTitle className="text-2xl">{user.name || "Unnamed User"}</CardTitle>
-          <p className="text-muted-foreground">{user.email}</p>
+    <Card className="relative overflow-hidden rounded-[2.5rem] border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+      <CardHeader className="pb-8 space-y-4">
+        <div className="flex items-center gap-5">
+          <div className="relative group">
+            <Avatar className="h-20 w-20 rounded-[1.5rem] border border-white/10 shadow-2xl">
+              <AvatarImage src={user.image ?? undefined} className="object-cover" />
+              <AvatarFallback className="text-2xl font-black bg-primary/5 text-primary">
+                {getInitials(user.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-lg bg-emerald-500 flex items-center justify-center border-2 border-black shadow-lg">
+              <CheckCircle2 className="h-3.5 w-3.5 text-white" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px]">
+              <UserCircle className="h-3 w-3" />
+              Resident Identity
+            </div>
+            <CardTitle className="text-3xl font-black tracking-tighter text-white uppercase leading-none">
+              {user.name || "UNREGISTERED ENTITY"}
+            </CardTitle>
+            <p className="text-xs font-bold text-muted-foreground/60 tracking-tight">{user.email}</p>
+          </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <dl className="divide-y divide-border">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <InfoRow
-            label="Email Verified"
+            label="Registry Verification"
+            icon={Fingerprint}
             value={
               user.emailVerified ? (
-                <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/50 dark:text-green-300">
-                  <CheckCircle2 className="mr-1 h-3 w-3" />
-                  Verified on {formatDate(user.emailVerified)}
-                </Badge>
+                <div className="flex items-center gap-2 text-emerald-500">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  <span className="uppercase tracking-widest text-[10px]">Synchronized {formatDate(user.emailVerified)}</span>
+                </div>
               ) : (
-                <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700 dark:border-red-700 dark:bg-red-900/50 dark:text-red-300">
-                  <XCircle className="mr-1 h-3 w-3" />
-                  Not Verified
-                </Badge>
+                <div className="flex items-center gap-2 text-rose-500">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span className="uppercase tracking-widest text-[10px]">Pending Orchestration</span>
+                </div>
               )
             }
           />
           <InfoRow
-            label="Onboarding Complete"
+            label="Onboarding Manifest"
+            icon={ShieldCheck}
             value={
               user.onboardingComplete ? (
-                <span className="flex items-center text-green-600">
-                  <CheckCircle2 className="mr-1 h-4 w-4" /> Yes
-                </span>
+                <span className="text-emerald-500 uppercase tracking-widest text-[10px]">Validated</span>
               ) : (
-                <span className="flex items-center text-amber-600">
-                  <XCircle className="mr-1 h-4 w-4" /> No
-                </span>
+                <span className="text-amber-500 uppercase tracking-widest text-[10px]">Incomplete</span>
               )
             }
           />
           <InfoRow
-            label="Date Joined"
-            value={formatDate(user.createdAt)}
+            label="Registry Entry"
+            icon={Calendar}
+            value={
+              <span className="text-foreground uppercase tracking-widest text-[10px]">{formatDate(user.createdAt)}</span>
+            }
           />
-        </dl>
+        </div>
       </CardContent>
     </Card>
   );

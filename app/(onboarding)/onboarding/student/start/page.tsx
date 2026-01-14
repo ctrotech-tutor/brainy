@@ -1,76 +1,88 @@
 import Link from "next/link";
-import { ArrowRight, University, Check } from "lucide-react";
+import { ArrowRight, University, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Metadata } from "next";
+import { motion } from "framer-motion";
 
 export const metadata: Metadata = {
-  title: "Student Onboarding",
-  description: "Set up your student profile",
+  title: "Student Verification Phase",
+  description: "Initialize your institutional identity sequence.",
 };
 
 export default function StudentOnboardingStartPage() {
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
-      {/* Left Panel: Visuals & Context */}
-      <div className="relative hidden lg:flex flex-col items-center justify-center bg-muted/40 p-10 text-center">
-        <div className="aurora-bg" />
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border bg-background/50 text-primary">
-            <University className="h-10 w-10" />
+    <div className="w-full space-y-12">
+      {/* Narrative Header */}
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-widest text-primary">
+          <Sparkles className="h-3 w-3" />
+          Sequence Phase 02
+        </div>
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-[1.1]">
+          Identity <span className="text-primary italic">Verification.</span>
+        </h1>
+        <p className="max-w-xl mx-auto text-sm md:text-base font-medium text-muted-foreground leading-relaxed">
+          To unlock the full potential of Brainy Multi-Agent AI, we need to establish a cryptographically secure link to your institution.
+        </p>
+      </div>
+
+      {/* Verification Matrix */}
+      <div className="relative p-8 rounded-[3rem] bg-card/30 border border-white/5 backdrop-blur-xl shadow-2xl overflow-hidden group">
+        <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-50 transition-opacity" />
+
+        <div className="relative z-10 flex flex-col items-center text-center space-y-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-[2rem] bg-primary/10 text-primary border border-primary/20 shadow-xl">
+              <University className="h-10 w-10" />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold tracking-tighter text-foreground">
-            Student Verification
-          </h1>
-          <p className="mt-4 max-w-sm text-lg text-foreground/80">
-            Connecting your account to a verified institution unlocks powerful, personalized learning tools.
-          </p>
+
+          <div className="space-y-6 w-full max-w-md">
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground/60 border-b border-white/5 pb-4">
+              Required Protocol Data
+            </h3>
+
+            <div className="grid gap-4">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/2 border border-white/5 text-left">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-primary/80">Protocol A</div>
+                  <div className="text-xs font-bold text-foreground">Official University Email (.edu)</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/2 border border-white/5 text-left">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-primary/80">Protocol B</div>
+                  <div className="text-xs font-bold text-foreground">Matriculation / Student ID</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right Panel: Information & Action */}
-      <div className="flex w-full items-center justify-center bg-background p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
-          {/* Header */}
-          <div>
-            <Badge variant="outline">Step 1 of 2</Badge>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground">
-              Let&apos; Get You Verified
-            </h2>
-            <p className="mt-2 text-lg text-muted-foreground">
-              To get started, you&apos;ll need to provide a few details to confirm your student status.
-            </p>
-          </div>
+      {/* Action Sequence */}
+      <div className="flex flex-col items-center gap-6">
+        <Button
+          asChild
+          className="group relative h-16 w-full max-w-sm rounded-[1.25rem] bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all hover:shadow-primary/40 hover:scale-[1.02] active:scale-95"
+        >
+          <Link href="/onboarding/student/details">
+            Enter Verification Data
+            <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </Button>
 
-          {/* Information Needed Section */}
-          <div className="space-y-6 rounded-lg border bg-background/30 p-6">
-            <h3 className="font-semibold text-foreground">
-              Please have the following ready:
-            </h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <Check className="h-5 w-5 shrink-0 text-primary" />
-                <span className="text-muted-foreground">Your official university-issued email address.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Check className="h-5 w-5 shrink-0 text-primary" />
-                <span className="text-muted-foreground">Your matriculation or student ID number.</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Call to Action */}
-          <div>
-            <Button size="lg" className="w-full text-base" asChild>
-              <Link href="/onboarding/student/details">
-                Continue
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              You are one step away from your personalized dashboard.
-            </p>
-          </div>
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 text-center leading-relaxed">
+          Sequence takes approximately 120 seconds. <br />
+          Encrypted with military-grade SHA-256.
         </div>
       </div>
     </div>
