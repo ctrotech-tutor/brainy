@@ -1,4 +1,3 @@
-// app/get-started/GetStartedClient.tsx
 "use client";
 
 import { useState } from "react";

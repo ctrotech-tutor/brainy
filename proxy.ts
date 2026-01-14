@@ -56,6 +56,37 @@ export default auth((request) => {
   const isApiRoute = pathname.startsWith("/api/");
   const isHomePage = pathname === "/";
 
+  // Helper to determine the best dashboard landing for a user
+  const getDashboardPath = (userRoles: string[]) => {
+    if (userRoles.includes("PLATFORM_ADMIN")) return "/platform/dashboard";
+    if (userRoles.includes("INSTITUTION_ADMIN")) return "/dashboard/institution";
+    if (userRoles.includes("STUDENT")) return "/dashboard/student";
+    if (userRoles.includes("TUTOR")) return "/dashboard/tutor";
+    return "/dashboard";
+  };
+
+  // ============================================
+  // PUBLIC ROUTES (Always Accessible)
+  // ============================================
+
+  const isPublicRoute = PUBLIC_ROUTES.some(route =>
+    pathname === route || pathname.startsWith(`${route}/`)
+  );
+
+  // APIs handled separately later
+  if (isPublicRoute && !isApiRoute && !AUTH_ROUTES.includes(pathname)) {
+    return NextResponse.next();
+  }
+
+  // ============================================
+  // AUTH ROUTES (Redirect if already logged in)
+  // ============================================
+
+  if (AUTH_ROUTES.includes(pathname) && isAuthenticated) {
+    const dashboardPath = getDashboardPath(roles);
+    return NextResponse.redirect(new URL(dashboardPath, request.url));
+  }
+
   // ============================================
   // ONBOARDING ENFORCEMENT
   // ============================================
@@ -83,53 +114,31 @@ export default auth((request) => {
   }
 
   // ============================================
-  // PUBLIC ROUTES
-  // ============================================
-
-  const isPublicRoute = PUBLIC_ROUTES.some(route =>
-    pathname === route || pathname.startsWith(`${route}/`)
-  );
-
-  if (isPublicRoute && !AUTH_ROUTES.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // ============================================
-  // AUTH ROUTES
-  // ============================================
-
-  if (AUTH_ROUTES.includes(pathname) && isAuthenticated) {
-    let dashboardPath = "/dashboard";
-
-    if (roles.includes("PLATFORM_ADMIN")) {
-      dashboardPath = "/platform/dashboard";
-    } else if (roles.includes("INSTITUTION_ADMIN")) {
-      dashboardPath = "/dashboard/institution";
-    } else if (roles.includes("STUDENT")) {
-      dashboardPath = "/dashboard/student";
-    } else if (roles.includes("TUTOR")) {
-      dashboardPath = "/dashboard/tutor";
-    }
-
-    return NextResponse.redirect(new URL(dashboardPath, request.url));
-  }
-
-  // ============================================
-  // PROTECTED ROUTES
+  // PROTECTED ROUTES & DASHBOARD LANDING
   // ============================================
 
   const isProtectedRoute = PROTECTED_ROUTES.some(route =>
     pathname.startsWith(route)
   );
 
-  if (isProtectedRoute && !isAuthenticated) {
-    const url = new URL("/auth/login", request.url);
-    url.searchParams.set("from", pathname);
-    return NextResponse.redirect(url);
+  if (isProtectedRoute) {
+    if (!isAuthenticated) {
+      const url = new URL("/auth/login", request.url);
+      url.searchParams.set("from", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    // Redirect the generic /dashboard to the actual role-specific dashboard
+    if (pathname === "/dashboard") {
+      const dashboardPath = getDashboardPath(roles);
+      if (dashboardPath !== "/dashboard") {
+        return NextResponse.redirect(new URL(dashboardPath, request.url));
+      }
+    }
   }
 
   // ============================================
-  // API AUTH
+  // API AUTHENTICATION
   // ============================================
 
   if (isApiRoute && !isAuthenticated) {
