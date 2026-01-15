@@ -50,8 +50,8 @@ export function ActionCard({ institutionId, currentStatus }: ActionCardProps) {
     onSuccess: (data) => {
       toast.success(data.message || "Institution status updated successfully!");
       // Refresh the page to show updated status or redirect
+      router.push("/platform/institutions/pending");
       router.refresh();
-      router.push("/institutions/pending"); // Redirect back to the pending list
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.error || "An error occurred.");
@@ -74,7 +74,7 @@ export function ActionCard({ institutionId, currentStatus }: ActionCardProps) {
   // If the institution is already approved or rejected, show a different state
   if (currentStatus !== "PENDING" && currentStatus !== "UNDER_REVIEW") {
     return (
-      <Card>
+      <Card className="rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
         <CardHeader>
           <CardTitle>Actions</CardTitle>
         </CardHeader>
@@ -89,7 +89,7 @@ export function ActionCard({ institutionId, currentStatus }: ActionCardProps) {
 
   return (
     <>
-      <Card>
+      <Card className="rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
         <CardHeader>
           <CardTitle>Take Action</CardTitle>
           <CardDescription>Approve or reject this application.</CardDescription>
@@ -98,7 +98,7 @@ export function ActionCard({ institutionId, currentStatus }: ActionCardProps) {
           <Button
             onClick={handleApprove}
             disabled={isPending}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-success hover:bg-success/90 text-success-foreground"
           >
             {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
             Approve
@@ -117,25 +117,26 @@ export function ActionCard({ institutionId, currentStatus }: ActionCardProps) {
 
       {/* Rejection Confirmation Dialog */}
       <AlertDialog open={isRejecting} onOpenChange={setIsRejecting}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-border bg-popover/80 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure you want to reject this application?</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-muted-foreground/80">
               This action cannot be undone. Please provide a clear reason for the rejection, which will be logged and may be sent to the applicant.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="grid gap-2">
-            <Label htmlFor="rejection-reason">Rejection Reason</Label>
+          <div className="grid gap-2 py-4">
+            <Label htmlFor="rejection-reason" className="text-xs font-black uppercase tracking-widest text-muted-foreground/60">Rejection Reason</Label>
             <Textarea
               id="rejection-reason"
               placeholder="e.g., Institution could not be verified, domain mismatch, etc."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
+              className="min-h-[100px] border-border bg-card"
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReject} disabled={!rejectionReason.trim()}>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReject} disabled={!rejectionReason.trim()} className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Confirm Rejection
             </AlertDialogAction>
           </AlertDialogFooter>

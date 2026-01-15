@@ -51,7 +51,7 @@ export function UserNavClient({ user }: UserNavClientProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all p-0">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-xl bg-accent/10 border border-border hover:bg-accent/20 transition-all p-0">
           <Avatar className="h-8 w-8 rounded-lg">
             <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} className="rounded-lg" />
             <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-[10px] font-black uppercase">
@@ -60,10 +60,10 @@ export function UserNavClient({ user }: UserNavClientProps) {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-64 border-white/10 bg-black/60 backdrop-blur-2xl shadow-2xl rounded-2xl p-2" align="end" forceMount>
+      <DropdownMenuContent className="w-64 border-border bg-popover/80 backdrop-blur-2xl shadow-2xl rounded-2xl p-2" align="end" forceMount>
         <DropdownMenuLabel className="font-normal p-4">
           <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 rounded-xl border border-white/10">
+            <Avatar className="h-10 w-10 rounded-xl border border-border">
               <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
               <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-black uppercase text-xs">
                 {getInitials(user.name)}
@@ -83,21 +83,21 @@ export function UserNavClient({ user }: UserNavClientProps) {
         <DropdownMenuGroup className="p-1 space-y-1">
           <DropdownMenuItem
             onSelect={() => router.push('/dashboard')}
-            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-white/5 focus:text-foreground transition-all"
+            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-accent focus:text-foreground transition-all"
           >
             <LayoutDashboard className="mr-3 h-4 w-4 opacity-50" />
             <span>Dashboard</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => router.push('/settings/profile')}
-            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-white/5 focus:text-foreground transition-all"
+            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-accent focus:text-foreground transition-all"
           >
             <UserIcon className="mr-3 h-4 w-4 opacity-50" />
             <span>Profile Identity</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => router.push('/settings/account')}
-            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-white/5 focus:text-foreground transition-all"
+            className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/80 focus:bg-accent focus:text-foreground transition-all"
           >
             <Settings className="mr-3 h-4 w-4 opacity-50" />
             <span>Configuration</span>
@@ -106,7 +106,7 @@ export function UserNavClient({ user }: UserNavClientProps) {
 
         {isPlatformAdmin && (
           <>
-            <DropdownMenuSeparator className="bg-white/5 mx-2" />
+            <DropdownMenuSeparator className="bg-border mx-2" />
             <DropdownMenuGroup className="p-1">
               <DropdownMenuItem
                 onSelect={() => router.push('/platform/dashboard')}

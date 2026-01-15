@@ -5,6 +5,8 @@ import Footer from "@/components/core/Footer";
 import { BackgroundDecor } from "@/components/core/background-decor";
 import { validateRequest } from "@/lib/auth";
 
+import { getStructuredData } from "@/lib/seo";
+
 export default async function MarketingLayout({
     children,
 }: {
@@ -14,6 +16,10 @@ export default async function MarketingLayout({
 
     return (
         <div className="relative min-h-screen bg-background">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(getStructuredData()) }}
+            />
             <BackgroundDecor />
             <Navbar user={user} />
             <main className="relative z-10">

@@ -187,18 +187,18 @@ export function DataTable<TData, TValue>({
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-10 w-full max-w-sm rounded-xl bg-white/5" />
-          <Skeleton className="ml-auto h-10 w-28 rounded-xl bg-white/5" />
+          <Skeleton className="h-10 w-full max-w-sm rounded-xl bg-muted/20" />
+          <Skeleton className="ml-auto h-10 w-28 rounded-xl bg-muted/20" />
         </div>
-        <div className="rounded-[2rem] border border-white/5 bg-white/5 backdrop-blur-xl overflow-hidden">
+        <div className="rounded-[2rem] border border-border bg-card/50 backdrop-blur-xl overflow-hidden">
           <div className="p-4 sm:p-6">
             <Table>
-              <TableHeader className="border-b-white/5 bg-white/5">
+              <TableHeader className="border-b border-border bg-muted/20">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="hover:bg-transparent border-b-white/5">
+                  <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-border">
                     {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
-                        <Skeleton className="h-4 w-20 bg-white/10" />
+                        <Skeleton className="h-4 w-20 bg-muted/30" />
                       </TableHead>
                     ))}
                   </TableRow>
@@ -206,10 +206,10 @@ export function DataTable<TData, TValue>({
               </TableHeader>
               <TableBody>
                 {[...Array(limit)].map((_, i) => (
-                  <TableRow key={i} className="hover:bg-white/5 transition-colors border-b-white/5">
+                  <TableRow key={i} className="hover:bg-accent transition-colors border-b border-border">
                     {resolvedColumns.map((_, j) => (
                       <TableCell key={j}>
-                        <Skeleton className="h-4 w-full bg-white/5" />
+                        <Skeleton className="h-4 w-full bg-muted/20" />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -224,7 +224,7 @@ export function DataTable<TData, TValue>({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-white/10 bg-white/5 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-border bg-card/50 py-12 text-center">
         <div className="h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
           <Loader2 className="h-8 w-8 text-destructive animate-spin" />
         </div>
@@ -232,7 +232,7 @@ export function DataTable<TData, TValue>({
         <p className="mt-2 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">
           {error instanceof Error ? error.message : "An unknown error occurred"}
         </p>
-        <Button variant="outline" size="sm" className="mt-6 rounded-xl border-white/10 bg-white/5" onClick={() => refetch()}>
+        <Button variant="outline" size="sm" className="mt-6 rounded-xl border-border bg-card" onClick={() => refetch()}>
           Retry Sequence
         </Button>
       </div>

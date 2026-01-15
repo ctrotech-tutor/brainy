@@ -59,6 +59,7 @@ export interface PlatformStats {
   activeInstitutions: number;
   totalUsers: number;
   totalStudents: number;
+  unreadLeads: number;
 }
 
 // --- COMPONENTS ---

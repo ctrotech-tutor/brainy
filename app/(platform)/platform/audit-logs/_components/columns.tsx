@@ -59,7 +59,7 @@ export const getColumns = (): ColumnDef<AuditLog>[] => [
       return (
         <div className="flex flex-col gap-1.5 py-1">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/5 border border-primary/10">
+            <div className="p-1.5 rounded-lg bg-accent text-primary border border-border">
               <Activity className="h-3 w-3 text-primary" />
             </div>
             <span className="text-[10px] font-black tracking-widest text-foreground uppercase">{formatAction(log.action)}</span>
@@ -94,7 +94,7 @@ export const getColumns = (): ColumnDef<AuditLog>[] => [
       const actor = row.original.actor;
       if (!actor) {
         return (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-card border border-border">
             <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground/40" />
             <span className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-widest italic">System Protocol</span>
           </div>
@@ -102,8 +102,8 @@ export const getColumns = (): ColumnDef<AuditLog>[] => [
       }
       return (
         <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8 rounded-lg border border-white/5 shadow-lg">
-            <AvatarFallback className="bg-primary/5 text-primary text-[9px] font-black uppercase">
+          <Avatar className="h-8 w-8 rounded-lg border border-border shadow-lg">
+            <AvatarFallback className="bg-accent text-primary text-[9px] font-black uppercase">
               {getInitials(actor.name)}
             </AvatarFallback>
           </Avatar>
@@ -138,7 +138,7 @@ export const getColumns = (): ColumnDef<AuditLog>[] => [
                 <span className="uppercase tracking-widest group-hover:text-foreground transition-colors">{relativeTime}</span>
               </div>
             </TooltipTrigger>
-            <TooltipContent className="border-white/10 bg-black/80 backdrop-blur-xl rounded-xl p-3 shadow-2xl">
+            <TooltipContent className="border-border bg-popover/80 backdrop-blur-xl rounded-xl p-3 shadow-2xl">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
                 {fullDate}
               </p>

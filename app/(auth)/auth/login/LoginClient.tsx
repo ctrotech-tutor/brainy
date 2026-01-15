@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const GoogleButton = ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
@@ -30,7 +31,7 @@ const GoogleButton = ({ onClick, disabled }: { onClick: () => void; disabled: bo
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="h-12 w-full rounded-2xl border-white/10 bg-white/5 font-bold transition-all hover:bg-white/10 hover:shadow-lg active:scale-[0.98]"
+    className="h-12 w-full rounded-2xl border-border bg-muted/40 font-bold transition-all hover:bg-muted/60 hover:shadow-lg active:scale-[0.98]"
   >
     <svg className="mr-3 h-4 w-4" viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -57,7 +58,7 @@ function AuthErrorAlert() {
 
   return (
     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-      <Alert variant="destructive" className="rounded-2xl border-destructive/20 bg-destructive/5 backdrop-blur-md">
+      <Alert variant="destructive" className="rounded-2xl border-destructive/20 bg-destructive/10 backdrop-blur-md">
         <Terminal className="h-4 w-4" />
         <AlertTitle className="font-bold tracking-tight">Authentication Error</AlertTitle>
         <AlertDescription className="text-sm font-medium">
@@ -141,7 +142,7 @@ export default function LoginClient() {
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-white/5" />
+            <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
             <span className="bg-background px-4 text-muted-foreground/50">
@@ -161,7 +162,7 @@ export default function LoginClient() {
                   <FormControl>
                     <Input
                       placeholder="you@institution.edu"
-                      className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                      className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                       {...field}
                     />
                   </FormControl>
@@ -181,10 +182,9 @@ export default function LoginClient() {
                     </Link>
                   </div>
                   <FormControl>
-                    <Input
-                      type="password"
+                    <PasswordInput
                       placeholder="••••••••"
-                      className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                      className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                       {...field}
                     />
                   </FormControl>

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { institutions, users, studentProfiles } from "@/db/schema";
+import { institutions, users, studentProfiles, marketingLeads } from "@/db/schema";
 import { validateRequest } from "@/lib/auth";
 import { RoleGuard } from "@/lib/utils/roles";
-import { eq, count, isNotNull } from "drizzle-orm";
+import { eq, count, isNotNull, and, isNull } from "drizzle-orm";
 import { ApiResponses } from "@/lib/api-response";
 
 export async function GET() {
@@ -15,7 +15,7 @@ export async function GET() {
 
     await RoleGuard.requireRole(user.id, "PLATFORM_ADMIN");
 
-    const [pendingInstitutions, activeInstitutions, totalUsers, totalStudents] =
+    const [pendingInstitutions, activeInstitutions, totalUsers, totalStudents, unreadLeads] =
       await Promise.all([
         db
           .select({ value: count() })
@@ -33,6 +33,11 @@ export async function GET() {
           .select({ value: count() })
           .from(studentProfiles)
           .where(isNotNull(studentProfiles.verifiedAt)),
+
+        db
+          .select({ value: count() })
+          .from(marketingLeads)
+          .where(and(isNull(marketingLeads.repliedAt), isNull(marketingLeads.seenAt))),
       ]);
 
     return ApiResponses.success({
@@ -40,6 +45,7 @@ export async function GET() {
       activeInstitutions: activeInstitutions[0].value,
       totalUsers: totalUsers[0].value,
       totalStudents: totalStudents[0].value,
+      unreadLeads: unreadLeads[0].value,
     });
   } catch (error) {
     return ApiResponses.handleError(error);

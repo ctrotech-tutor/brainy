@@ -20,7 +20,7 @@ export function SubmitterCard({ submitter }: SubmitterCardProps) {
   // Handle the case where the submitter might be null (e.g., user was deleted)
   if (!submitter) {
     return (
-      <Card>
+      <Card className="rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
         <CardHeader>
           <CardTitle>Submitter Information</CardTitle>
         </CardHeader>
@@ -37,7 +37,7 @@ export function SubmitterCard({ submitter }: SubmitterCardProps) {
     : submitter.email.substring(0, 2).toUpperCase();
 
   return (
-    <Card>
+    <Card className="rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
       <CardHeader>
         <CardTitle>Submitted By</CardTitle>
         <CardDescription>The user who initiated this application.</CardDescription>

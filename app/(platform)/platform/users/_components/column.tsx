@@ -66,7 +66,7 @@ export const getColumns = ({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="translate-y-[2px] border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+          className="translate-y-[2px] border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
         />
       ),
       cell: ({ row }) => (
@@ -74,7 +74,7 @@ export const getColumns = ({
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="translate-y-[2px] border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+          className="translate-y-[2px] border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
         />
       ),
       enableSorting: false,
@@ -99,13 +99,13 @@ export const getColumns = ({
         return (
           <div className="flex items-center gap-4 py-1">
             <div className="relative group">
-              <Avatar className="h-10 w-10 rounded-xl border border-white/5 shadow-2xl transition-transform group-hover:scale-105">
+              <Avatar className="h-10 w-10 rounded-xl border border-border shadow-2xl transition-transform group-hover:scale-105">
                 <AvatarImage
                   src={user.image ?? undefined}
                   alt={user.name ?? "User"}
                   className="object-cover"
                 />
-                <AvatarFallback className="bg-primary/5 text-primary text-[10px] font-black uppercase rounded-xl">
+                <AvatarFallback className="bg-accent text-primary text-[10px] font-black uppercase rounded-xl">
                   {getInitials(user.name)}
                 </AvatarFallback>
               </Avatar>
@@ -164,14 +164,14 @@ export const getColumns = ({
         return (
           <div className="flex items-center gap-2">
             {isVerified ? (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500/80">Verified</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-success/10 border border-success/20">
+                <CheckCircle2 className="h-3 w-3 text-success" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-success/80">Verified</span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-rose-500/5 border border-rose-500/10">
-                <XCircle className="h-3 w-3 text-rose-500" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-rose-500/80">Pending</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-destructive/10 border border-destructive/20">
+                <XCircle className="h-3 w-3 text-destructive" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-destructive/80">Pending</span>
               </div>
             )}
           </div>
@@ -203,16 +203,16 @@ export const getColumns = ({
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/5 rounded-xl">
+              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-accent rounded-xl">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4 text-muted-foreground/60" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 border-white/10 bg-black/60 backdrop-blur-2xl shadow-2xl rounded-2xl p-2">
+            <DropdownMenuContent align="end" className="w-48 border-border bg-popover/80 backdrop-blur-2xl shadow-2xl rounded-2xl p-2">
               <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 px-3 py-2">
                 User Protocols
               </DropdownMenuLabel>
-              <DropdownMenuItem asChild className="rounded-xl focus:bg-white/5">
+              <DropdownMenuItem asChild className="rounded-xl focus:bg-accent">
                 <Link href={`/platform/users/${user.id}`} className="flex items-center gap-2 w-full text-[10px] font-bold uppercase tracking-widest">
                   <UserCircle className="h-3.5 w-3.5" />
                   View Profile
@@ -223,12 +223,12 @@ export const getColumns = ({
                   setSelectedRowData(user);
                   setModalOpen(true);
                 }}
-                className="rounded-xl focus:bg-white/5 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
+                className="rounded-xl focus:bg-accent text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
               >
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Edit Permissions
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/5 mx-1" />
+              <DropdownMenuSeparator className="bg-border mx-1" />
               <DropdownMenuItem className="rounded-xl text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                 <ShieldCheck className="h-3.5 w-3.5 rotate-180" />
                 Revoke Access

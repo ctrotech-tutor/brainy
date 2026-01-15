@@ -26,11 +26,11 @@ export function InstitutionActions({
 
     try {
       const response = await fetch(
-        `/api/platform/institutions/${institutionId}/approve`,
+        `/api/platform/institutions/review/${institutionId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "ACTIVE" }),
+          body: JSON.stringify({ action: "APPROVE" }),
         }
       );
 
@@ -41,6 +41,7 @@ export function InstitutionActions({
       }
 
       toast.success(`${institutionName} has been approved!`);
+      router.push("/platform/institutions/pending");
       router.refresh();
     } catch (error) {
       toast.error(
@@ -61,13 +62,13 @@ export function InstitutionActions({
 
     try {
       const response = await fetch(
-        `/api/platform/institutions/${institutionId}/approve`,
+        `/api/platform/institutions/review/${institutionId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            status: "REJECTED",
-            rejectionReason: rejectionReason.trim(),
+            action: "REJECT",
+            reason: rejectionReason.trim(),
           }),
         }
       );
@@ -80,6 +81,7 @@ export function InstitutionActions({
 
       toast.success(`${institutionName} has been rejected`);
       setShowRejectModal(false);
+      router.push("/platform/institutions/pending");
       router.refresh();
     } catch (error) {
       toast.error(

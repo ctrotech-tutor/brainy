@@ -18,59 +18,37 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const categories = [
-  { id: "general", name: "General", icon: HelpCircle },
-  { id: "students", name: "Students", icon: GraduationCap },
-  { id: "tutors", name: "Tutors", icon: Zap },
-  { id: "institutions", name: "Institutions", icon: Building2 },
-  { id: "security", name: "Security", icon: Shield },
-];
-
-const faqs = [
-  {
-    id: 1,
-    category: "general",
-    question: "What is Brainy OS?",
-    answer: "Brainy OS is a comprehensive academic assessment ecosystem designed to streamline testing, grading, and result management while ensuring the highest standards of integrity."
-  },
-  {
-    id: 2,
-    category: "security",
-    question: "How does Brainy prevent cheating?",
-    answer: "We use a multi-layered approach including time-windowed assessments, activity pattern recognition, IP tracking, and role-based verification to ensure every test is fair and genuine."
-  },
-  {
-    id: 3,
-    category: "students",
-    question: "Can I take a quiz on my mobile phone?",
-    answer: "Yes! Brainy is fully responsive. As long as your institution allows mobile access for a specific assessment, you can take quizzes on any modern smartphone browser."
-  },
-  {
-    id: 4,
-    category: "tutors",
-    question: "How do I use the AI quiz generator?",
-    answer: "Our AI assistant can help you generate questions based on topics or uploaded text. Simply navigate to your dashboard, select 'Create Quiz', and use the 'AI Assist' option."
-  },
-  {
-    id: 5,
-    category: "institutions",
-    question: "How do we verify our institution?",
-    answer: "Institutions must submit official documentation through the onboarding process. Our team reviews these documents to ensure only legitimate academic bodies are verified on the platform."
-  },
-  {
-    id: 6,
-    category: "general",
-    question: "Is there a free plan for students?",
-    answer: "Students access Brainy through their institutions or tutors. There are no direct costs to students for participating in assessments assigned to them."
-  },
-];
+import { FAQS, FAQ_CATEGORIES } from "@/lib/faqs";
+import { useEffect } from "react";
 
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const filteredFaqs = faqs.filter(faq => {
+  // Deep linking support
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash && FAQS.find(f => f.id === hash)) {
+      setExpandedId(hash);
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }, []);
+
+  const handleExpand = (id: string) => {
+    const newId = expandedId === id ? null : id;
+    setExpandedId(newId);
+    if (newId) {
+      window.history.replaceState(null, "", `#${id}`);
+    } else {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  };
+
+  const filteredFaqs = FAQS.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || faq.category === activeCategory;
@@ -79,7 +57,6 @@ export default function HelpPage() {
 
   return (
     <>
-
       <Wrapper className="py-24 sm:py-32">
         {/* Header Section */}
         <div className="max-w-3xl mx-auto text-center mb-16 px-4">
@@ -96,60 +73,62 @@ export default function HelpPage() {
               How can we <span className="text-primary prose-italics">assist you?</span>
             </h1>
 
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground" />
+            <div className="relative max-w-2xl mx-auto group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <Input
                 type="text"
                 placeholder="Search for questions, categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-16 rounded-[2rem] bg-card/50 border-white/10 pl-16 pr-8 text-lg shadow-2xl shadow-primary/5 backdrop-blur-xl focus-visible:ring-primary/20"
+                className="h-16 rounded-[2rem] bg-card border-border pl-16 pr-8 text-lg shadow-2xl shadow-primary/5 backdrop-blur-xl focus-visible:ring-primary/20 transition-all focus-visible:scale-[1.02]"
               />
             </div>
           </motion.div>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-12 items-start">
+        <div className="grid lg:grid-cols-[280px_1fr] gap-12 items-start">
           {/* Categories Sidebar */}
-          <aside className="lg:col-span-1 space-y-6">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground/60 px-4">Categories</h2>
-            <nav className="flex flex-col gap-2">
-              <button
-                onClick={() => setActiveCategory("all")}
-                className={cn(
-                  "flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold transition-all",
-                  activeCategory === "all"
-                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                    : "text-muted-foreground hover:bg-card hover:text-foreground"
-                )}
-              >
-                <Sparkles className="h-5 w-5" />
-                All FAQs
-              </button>
-              {categories.map((cat) => (
+          <aside className="lg:col-span-1 space-y-8">
+            <div className="space-y-3">
+              <h2 className="px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Knowledge Base</h2>
+              <nav className="flex flex-col gap-1">
                 <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
+                  onClick={() => setActiveCategory("all")}
                   className={cn(
-                    "flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-bold transition-all",
-                    activeCategory === cat.id
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+                    activeCategory === "all"
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                       : "text-muted-foreground hover:bg-card hover:text-foreground"
                   )}
                 >
-                  <cat.icon className="h-5 w-5" />
-                  {cat.name}
+                  <Sparkles className="h-5 w-5" />
+                  All FAQs
                 </button>
-              ))}
-            </nav>
+                {FAQ_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all",
+                      activeCategory === cat.id
+                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                        : "text-muted-foreground hover:bg-card hover:text-foreground"
+                    )}
+                  >
+                    <cat.icon className="h-5 w-5" />
+                    {cat.name}
+                  </button>
+                ))}
+              </nav>
+            </div>
 
-            <div className="p-8 rounded-[2rem] bg-card/40 border border-white/5 backdrop-blur-md">
+            <div className="p-8 rounded-[2.5rem] bg-card border border-border shadow-sm">
               <h3 className="font-black text-foreground mb-4">Need more help?</h3>
-              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-xs text-muted-foreground mb-6 leading-relaxed">
                 If you can't find the answer you're looking for, feel free to contact
                 our support team.
               </p>
-              <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold border-white/10">
+              <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold border-border hover:bg-accent transition-all">
                 <Link href="/contact" className="flex items-center justify-center gap-2">
                   <MessageCircle className="h-4 w-4" />
                   Contact Support
@@ -159,7 +138,7 @@ export default function HelpPage() {
           </aside>
 
           {/* FAQ List */}
-          <div className="lg:col-span-3">
+          <div className="flex-1">
             <AnimatePresence mode="popLayout">
               {filteredFaqs.length > 0 ? (
                 <motion.div
@@ -169,26 +148,27 @@ export default function HelpPage() {
                   {filteredFaqs.map((faq) => (
                     <motion.div
                       key={faq.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
+                      id={faq.id}
+                      initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
                       className={cn(
                         "rounded-[2.5rem] border transition-all duration-300 overflow-hidden",
                         expandedId === faq.id
-                          ? "bg-card border-primary/20 shadow-2xl"
-                          : "bg-card/40 border-white/5 hover:border-white/10"
+                          ? "bg-card border-primary/20 shadow-xl"
+                          : "bg-card/40 border-border hover:border-primary/10"
                       )}
                     >
                       <button
-                        onClick={() => setExpandedId(expandedId === faq.id ? null : faq.id)}
-                        className="w-full flex items-center justify-between p-8 md:p-10 text-left"
+                        onClick={() => handleExpand(faq.id)}
+                        className="w-full flex items-center justify-between p-8 md:p-10 text-left group"
                       >
                         <span className="text-xl md:text-2xl font-black tracking-tight text-foreground pr-8">
                           {faq.question}
                         </span>
                         <div className={cn(
-                          "flex-shrink-0 h-10 w-10 rounded-full bg-secondary/50 flex items-center justify-center transition-transform duration-300",
-                          expandedId === faq.id ? "rotate-180 bg-primary/20 text-primary" : ""
+                          "flex-shrink-0 h-10 w-10 rounded-full bg-accent border border-border flex items-center justify-center transition-all duration-300",
+                          expandedId === faq.id ? "rotate-180 bg-primary/20 text-primary border-primary/20" : "group-hover:border-primary/20"
                         )}>
                           <ChevronDown className="h-6 w-6" />
                         </div>
@@ -202,7 +182,7 @@ export default function HelpPage() {
                             transition={{ duration: 0.3, ease: "easeInOut" }}
                           >
                             <div className="px-8 md:px-10 pb-10">
-                              <div className="h-px bg-white/5 mb-8" />
+                              <div className="h-px bg-border mb-8" />
                               <p className="text-lg text-muted-foreground leading-relaxed">
                                 {faq.answer}
                               </p>
@@ -217,7 +197,7 @@ export default function HelpPage() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-center py-24 rounded-[3rem] bg-card/20 border border-dashed border-white/10"
+                  className="text-center py-24 rounded-[3rem] bg-accent/20 border border-dashed border-border"
                 >
                   <HelpCircle className="h-16 w-16 text-muted-foreground mx-auto mb-6 opacity-20" />
                   <p className="text-xl font-bold text-muted-foreground">

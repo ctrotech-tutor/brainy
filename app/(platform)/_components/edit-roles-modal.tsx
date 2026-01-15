@@ -89,7 +89,7 @@ export function EditRolesModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md border-white/10 bg-black/60 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
+      <DialogContent className="sm:max-w-md border-border bg-popover/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl p-8 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
         <DialogHeader className="mb-8 p-0">
           <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-2">
@@ -100,27 +100,27 @@ export function EditRolesModal({
             Edit <span className="text-primary italic">Permissions.</span>
           </DialogTitle>
           <DialogDescription className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest mt-2 leading-relaxed">
-            Configure access levels for <span className="text-white italic">&quot;{user.name || user.email}&quot;</span>.
+            Configure access levels for <span className="text-foreground italic">&quot;{user.name || user.email}&quot;</span>.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-2 gap-3 py-2">
           {allRoles.map((role) => (
-            <div key={role} className="group flex items-center space-x-3 p-3 rounded-xl border border-white/5 bg-white/[0.02] transition-colors hover:bg-white/[0.05]">
+            <div key={role} className="group flex items-center space-x-3 p-3 rounded-xl border border-border bg-card transition-colors hover:bg-accent">
               <Checkbox
                 id={role}
                 checked={selectedRoles.includes(role)}
                 onCheckedChange={() => handleRoleToggle(role)}
-                className="border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
-              <Label htmlFor={role} className="text-[10px] font-black uppercase tracking-widest cursor-pointer text-muted-foreground/60 group-hover:text-white transition-colors">
+              <Label htmlFor={role} className="text-[10px] font-black uppercase tracking-widest cursor-pointer text-muted-foreground/60 group-hover:text-foreground transition-colors">
                 {role.replace(/_/g, " ")}
               </Label>
             </div>
           ))}
         </div>
 
-        <DialogFooter className="mt-8 pt-6 border-t border-white/5 gap-3 sm:justify-end">
+        <DialogFooter className="mt-8 pt-6 border-t border-border gap-3 sm:justify-end">
           <div className="hidden sm:flex items-center gap-2 mr-auto text-[9px] font-black uppercase tracking-widest text-muted-foreground/20">
             <Sparkles className="h-3 w-3" />
             Live registry sync
@@ -129,7 +129,7 @@ export function EditRolesModal({
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
-            className="rounded-xl hover:bg-white/5 text-[10px] font-black uppercase tracking-widest px-6"
+            className="rounded-xl hover:bg-accent text-[10px] font-black uppercase tracking-widest px-6"
           >
             Cancel
           </Button>

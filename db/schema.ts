@@ -108,6 +108,12 @@ export const questionTypeEnum = pgEnum("question_type", [
   "TRUE_FALSE",
 ]);
 
+export const blogPostStatusEnum = pgEnum("blog_post_status", [
+  "DRAFT",
+  "PUBLISHED",
+  "ARCHIVED",
+]);
+
 // ------------------------------
 // AUTH & USERS
 // ------------------------------
@@ -589,6 +595,116 @@ export const auditLogs = pgTable("audit_logs", {
   metadata: jsonb("metadata"),
 });
 
+export const legalDocuments = pgTable("legal_documents", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  content: text("content").notNull(), // Markdown
+  version: text("version").default("1.0").notNull(),
+  isPublished: boolean("is_published").default(false).notNull(),
+  updatedById: text("updated_by_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const marketingLeads = pgTable("marketing_leads", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject"),
+  message: text("message").notNull(),
+  type: text("type").default("CONTACT").notNull(), // CONTACT, ENTERPRISE, DEMO
+  status: text("status").default("NEW").notNull(), // NEW, READ, REPLIED, ARCHIVED
+  metadata: jsonb("metadata"),
+  repliedAt: timestamp("replied_at"),
+  seenAt: timestamp("seen_at"),
+  lastRepliedById: text("last_replied_by_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  replyThread: jsonb("reply_thread"), // Array of { content, sentAt, sentBy }
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ------------------------------
+// BLOG SYSTEM
+// ------------------------------
+export const blogCategories = pgTable("blog_categories", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const blogPosts = pgTable("blog_posts", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(), // Markdown content
+  coverImage: text("cover_image"),
+  
+  // SEO & Metadata
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  
+  // Author & Category
+  authorId: text("author_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  categoryId: text("category_id").references(() => blogCategories.id, {
+    onDelete: "set null",
+  }),
+  
+  // Publishing
+  status: blogPostStatusEnum("status").default("DRAFT").notNull(),
+  publishedAt: timestamp("published_at"),
+  
+  // Analytics
+  views: integer("views").default(0).notNull(),
+  readingTime: integer("reading_time"), // in minutes
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const blogTags = pgTable("blog_tags", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text("name").notNull().unique(),
+  slug: text("slug").notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const blogPostTags = pgTable(
+  "blog_post_tags",
+  {
+    postId: text("post_id")
+      .notNull()
+      .references(() => blogPosts.id, { onDelete: "cascade" }),
+    tagId: text("tag_id")
+      .notNull()
+      .references(() => blogTags.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.postId, table.tagId] }),
+  })
+);
+
 // ------------------------------
 // RELATIONS (Drizzle helpers)
 // ------------------------------
@@ -808,4 +924,42 @@ export const courseEnrollmentsRelations = relations(
 
 export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
   actor: one(users, { fields: [auditLogs.actorId], references: [users.id] }),
+}));
+
+export const legalDocumentsRelations = relations(legalDocuments, ({ one }) => ({
+  updatedBy: one(users, {
+    fields: [legalDocuments.updatedById],
+    references: [users.id],
+  }),
+}));
+
+export const blogCategoriesRelations = relations(blogCategories, ({ many }) => ({
+  posts: many(blogPosts),
+}));
+
+export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id],
+  }),
+  category: one(blogCategories, {
+    fields: [blogPosts.categoryId],
+    references: [blogCategories.id],
+  }),
+  tags: many(blogPostTags),
+}));
+
+export const blogTagsRelations = relations(blogTags, ({ many }) => ({
+  posts: many(blogPostTags),
+}));
+
+export const blogPostTagsRelations = relations(blogPostTags, ({ one }) => ({
+  post: one(blogPosts, {
+    fields: [blogPostTags.postId],
+    references: [blogPosts.id],
+  }),
+  tag: one(blogTags, {
+    fields: [blogPostTags.tagId],
+    references: [blogTags.id],
+  }),
 }));

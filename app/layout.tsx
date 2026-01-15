@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 // import PageTransition from "@/components/page-transition";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { CookieConsent } from "@/components/core/CookieConsent";
 
 // --- METADATA & VIEWPORT ---
 export const metadata: Metadata = {
@@ -131,6 +132,7 @@ export default function RootLayout({
 
             {/* Smooth page transitions */}
             <div>{children}</div>
+            <CookieConsent />
           </ThemeProvider>
         </QueryProvider>
       </body>

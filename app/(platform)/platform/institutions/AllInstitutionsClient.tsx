@@ -42,18 +42,18 @@ function StatusFilter() {
   return (
     <div className="relative group">
       <Select value={currentStatus} onValueChange={handleStatusChange}>
-        <SelectTrigger className="w-56 rounded-xl border-white/5 bg-white/5 backdrop-blur-md text-[10px] font-black uppercase tracking-widest h-10 px-4 focus:ring-primary/20 transition-all">
+        <SelectTrigger className="w-56 rounded-xl border-border bg-card/50 backdrop-blur-md text-[10px] font-black uppercase tracking-widest h-10 px-4 focus:ring-primary/20 transition-all">
           <div className="flex items-center gap-2">
             <Filter className="h-3.5 w-3.5 opacity-40" />
             <SelectValue placeholder="System Filter..." />
           </div>
         </SelectTrigger>
-        <SelectContent className="border-white/10 bg-black/60 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl">
-          <SelectItem value="all" className="rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-white/5">
+        <SelectContent className="border-border bg-popover/80 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl">
+          <SelectItem value="all" className="rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-accent">
             Full Spectrum
           </SelectItem>
           {institutionStatusEnum.enumValues.map((status) => (
-            <SelectItem key={status} value={status} className="capitalize rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-white/5">
+            <SelectItem key={status} value={status} className="capitalize rounded-xl text-[10px] font-bold uppercase tracking-widest focus:bg-accent">
               {status.replace("_", " ").toLowerCase()}
             </SelectItem>
           ))}
@@ -93,7 +93,7 @@ export default function AllInstitutionsClient() {
         <StatusFilter />
       </div>
 
-      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-white/5" />}>
+      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-muted/20" />}>
         <DataTable
           columns={columns}
           apiEndpoint="/api/platform/institutions"

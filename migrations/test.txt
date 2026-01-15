@@ -275,3 +275,6 @@ Google OAuth callback error: TypeError: Headers.append: "Bearer accessToken() {
  GET /auth/login?error=oauth_failed 200 in 1007ms (compile: 14ms, proxy.ts: 13ms, render: 980ms)
 ✓ Compiled in 745ms
 ✓ Compiled in 503ms
+
+
+cool .. .so now can we now implement a real notification badge  ... e.g  when a new institution is registerd then should be an indictor in our platform admin, when there a new user, when they submit new lead and many more like that .. we should be receiving realtime stuffs in our admin pannel

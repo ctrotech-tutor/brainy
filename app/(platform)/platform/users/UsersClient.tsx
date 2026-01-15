@@ -25,13 +25,13 @@ export default function UsersClient() {
             Comprehensive directory management for all institutional actors and administrative personnel.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md">
+        <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-card border border-border backdrop-blur-md">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Real-time sync</span>
         </div>
       </div>
 
-      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-white/5" />}>
+      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-muted/20" />}>
         <DataTable
           columns={getColumns}
           modalComponent={EditRolesModal}

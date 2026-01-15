@@ -2,12 +2,13 @@
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/db/tx";
+import { db } from "@/db";
 import {
   institutions,
   users,
   userRoles,
   institutionVerificationLogs,
+  auditLogs,
 } from "@/db/schema";
 import { requireAuth } from "@/lib/auth";
 import { RoleGuard } from "@/lib/utils/roles";
@@ -118,7 +119,7 @@ export async function POST(req: NextRequest,
       }
 
       // 4. --- Auditing ---
-      // Create a log entry for this action
+      // Create a log entry for this action in institution-specific logs
       await tx.insert(institutionVerificationLogs).values({
         institutionId,
         action: action,
@@ -129,6 +130,21 @@ export async function POST(req: NextRequest,
           action === "REJECT"
             ? validation.data.reason
             : "Institution approved.",
+      });
+
+      // Also log to global audit logs
+      await tx.insert(auditLogs).values({
+        actorId: adminUser.id,
+        action: `INSTITUTION_${action}ED`,
+        resourceId: institutionId,
+        resourceTable: "institutions",
+        payload: {
+          institutionId,
+          institutionName: institution.name,
+          previousStatus,
+          newStatus,
+          reason: action === "REJECT" ? validation.data.reason : undefined,
+        },
       });
 
       // TODO: Send notification email to the user who submitted the application

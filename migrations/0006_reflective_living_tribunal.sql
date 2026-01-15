@@ -1,0 +1,1 @@
+ALTER TABLE "marketing_leads" ADD COLUMN "seen_at" timestamp;

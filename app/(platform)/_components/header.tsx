@@ -32,16 +32,16 @@ const navLinks = [
 
 export function AdminHeader() {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-white/5 bg-transparent px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-border bg-transparent px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       {/* --- Mobile Navigation (Sheet) --- */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button size="icon" variant="outline" className="sm:hidden border-white/10 bg-white/5 backdrop-blur-md rounded-xl">
+          <Button size="icon" variant="outline" className="sm:hidden border-border bg-card/50 backdrop-blur-md rounded-xl">
             <PanelLeft className="h-5 w-5" />
             <span className="sr-only">Toggle Menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs border-r-white/5 bg-black/40 backdrop-blur-2xl p-0">
+        <SheetContent side="left" className="sm:max-w-xs border-r border-border bg-popover/80 backdrop-blur-2xl p-0">
           <nav className="flex flex-col h-full py-8 px-4 gap-2">
             <Link
               href="/platform/dashboard"
@@ -56,7 +56,7 @@ export function AdminHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-4 px-4 py-3 text-sm font-bold tracking-tight text-muted-foreground/60 rounded-xl transition-all hover:bg-white/5 hover:text-foreground active:bg-white/10"
+                  className="flex items-center gap-4 px-4 py-3 text-sm font-bold tracking-tight text-muted-foreground/60 rounded-xl transition-all hover:bg-accent hover:text-foreground active:bg-accent/50"
                 >
                   <link.icon className="h-5 w-5" />
                   {link.label}
@@ -64,7 +64,7 @@ export function AdminHeader() {
               ))}
             </div>
 
-            <div className="mt-auto flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
+            <div className="mt-auto flex items-center gap-2 px-4 py-3 rounded-xl bg-card border border-border">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Audit Phase 04 Active</span>
             </div>

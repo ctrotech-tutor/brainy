@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Sparkles,
   ShieldCheck,
+  Mail,
 } from "lucide-react";
 
 import { getErrorMessage } from "@/lib/utils";
@@ -56,8 +57,8 @@ const StatCard = ({
     whileHover={{ y: -4 }}
     className="group relative h-full"
   >
-    <div className="absolute inset-0 bg-white/5 blur-xl group-hover:bg-primary/5 transition-colors rounded-[2rem]" />
-    <Card className="relative h-full rounded-[2rem] border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl transition-all group-hover:border-primary/20">
+    <div className="absolute inset-0 bg-accent/20 blur-xl group-hover:bg-primary/5 transition-colors rounded-[2rem]" />
+    <Card className="relative h-full rounded-[2rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl transition-all group-hover:border-primary/20">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 transition-colors group-hover:text-primary">
           <Icon className="h-3.5 w-3.5" />
@@ -108,18 +109,18 @@ export default function DashboardClient() {
     return (
       <div className="space-y-10">
         <div className="space-y-3">
-          <Skeleton className="h-8 w-48 rounded-lg bg-white/5" />
-          <Skeleton className="h-4 w-64 rounded-lg bg-white/5" />
+          <Skeleton className="h-8 w-48 rounded-lg bg-muted/20" />
+          <Skeleton className="h-4 w-64 rounded-lg bg-muted/20" />
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-40 rounded-[2rem] bg-white/5 border border-white/10 p-6 space-y-4">
+            <div key={i} className="h-40 rounded-[2rem] bg-muted/10 border border-border p-6 space-y-4">
               <div className="flex justify-between items-center">
-                <Skeleton className="h-3 w-20 bg-white/10" />
-                <Skeleton className="h-4 w-4 rounded-full bg-white/10" />
+                <Skeleton className="h-3 w-20 bg-muted/20" />
+                <Skeleton className="h-4 w-4 rounded-full bg-muted/20" />
               </div>
-              <Skeleton className="h-10 w-16 bg-white/10" />
-              <Skeleton className="h-3 w-32 bg-white/10" />
+              <Skeleton className="h-10 w-16 bg-muted/20" />
+              <Skeleton className="h-3 w-32 bg-muted/20" />
             </div>
           ))}
         </div>
@@ -130,7 +131,7 @@ export default function DashboardClient() {
   // Handle error state
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-white/10 bg-white/5 py-24 text-center">
+      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-border bg-card/50 py-24 text-center">
         <div className="h-20 w-20 rounded-3xl bg-destructive/10 flex items-center justify-center mb-6">
           <AlertTriangle className="h-10 w-10 text-destructive" />
         </div>
@@ -158,7 +159,7 @@ export default function DashboardClient() {
             Synthesized operational parameters and institutional traffic analytics.
           </p>
         </div>
-        <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md">
+        <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-card border border-border backdrop-blur-md">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Registry Session: Active</span>
         </div>
@@ -168,7 +169,7 @@ export default function DashboardClient() {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+        className="grid gap-6 md:grid-cols-2 lg:grid-cols-5"
       >
         <motion.div variants={item}>
           <StatCard
@@ -185,7 +186,7 @@ export default function DashboardClient() {
             value={stats?.activeInstitutions ?? 0}
             icon={Building2}
             description="Verified academic clusters."
-            link="/platform/institutions"
+            link="/platform/institutions/active"
           />
         </motion.div>
         <motion.div variants={item}>
@@ -205,6 +206,15 @@ export default function DashboardClient() {
             description="Secured student credentials."
           />
         </motion.div>
+        <motion.div variants={item}>
+          <StatCard
+            title="Unread Leads"
+            value={stats?.unreadLeads ?? 0}
+            icon={Mail}
+            description="New contact inquiries."
+            link="/platform/leads"
+          />
+        </motion.div>
       </motion.div>
 
       {/* Placeholder for more complex analytics */}
@@ -212,7 +222,7 @@ export default function DashboardClient() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="h-64 flex flex-col items-center justify-center rounded-[3rem] border border-white/5 bg-white/5 backdrop-blur-xl border-dashed"
+        className="h-64 flex flex-col items-center justify-center rounded-[3rem] border border-border bg-card/50 backdrop-blur-xl border-dashed"
       >
         <div className="flex flex-col items-center gap-3 text-muted-foreground/20">
           <Activity className="h-12 w-12" />

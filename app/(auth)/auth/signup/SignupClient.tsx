@@ -24,6 +24,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const GoogleButton = ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
   <Button
@@ -31,7 +33,7 @@ const GoogleButton = ({ onClick, disabled }: { onClick: () => void; disabled: bo
     type="button"
     onClick={onClick}
     disabled={disabled}
-    className="h-12 w-full rounded-2xl border-white/10 bg-white/5 font-bold transition-all hover:bg-white/10 hover:shadow-lg active:scale-[0.98]"
+    className="h-12 w-full rounded-2xl border-border bg-muted/40 font-bold transition-all hover:bg-muted/60 hover:shadow-lg active:scale-[0.98]"
   >
     <svg className="mr-3 h-4 w-4" viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -49,7 +51,7 @@ const SuccessState = () => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center text-center space-y-8 p-8 rounded-[3rem] bg-card/30 border border-white/5 backdrop-blur-xl shadow-2xl"
+      className="flex flex-col items-center justify-center text-center space-y-8 p-8 rounded-[4rem] bg-card border border-border backdrop-blur-xl shadow-2xl"
     >
       <div className="relative">
         <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
@@ -67,8 +69,8 @@ const SuccessState = () => {
         </p>
       </div>
 
-      <div className="w-full space-y-4 pt-4 border-t border-white/5">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/2 border border-white/5 text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 text-left">
+      <div className="w-full space-y-4 pt-4 border-t border-border">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-muted/20 border border-border text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 text-left">
           <CheckCircle2 className="h-4 w-4 text-primary" />
           Link expires in 24 hours
         </div>
@@ -156,7 +158,7 @@ export default function SignupClient() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/5" />
+                <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
                 <span className="bg-background px-4 text-muted-foreground/50">
@@ -176,7 +178,7 @@ export default function SignupClient() {
                       <FormControl>
                         <Input
                           placeholder="Your identity"
-                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                           {...field}
                         />
                       </FormControl>
@@ -194,7 +196,7 @@ export default function SignupClient() {
                         <Input
                           type="email"
                           placeholder="you@institution.edu"
-                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                           {...field}
                         />
                       </FormControl>
@@ -209,10 +211,9 @@ export default function SignupClient() {
                     <FormItem className="space-y-1.5">
                       <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Password</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="••••••••"
-                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                           {...field}
                         />
                       </FormControl>
@@ -227,13 +228,33 @@ export default function SignupClient() {
                     <FormItem className="space-y-1.5">
                       <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">Confirm</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="••••••••"
-                          className="h-12 rounded-xl bg-card border-white/5 focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
+                          className="h-12 rounded-xl bg-card border-border focus-visible:ring-primary/20 backdrop-blur-md transition-all sm:text-sm"
                           {...field}
                         />
                       </FormControl>
+                      <FormMessage className="text-[10px] font-bold" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-xl bg-card border border-border p-4 py-3">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="rounded-md border-primary/20 data-[state=checked]:bg-primary transform transition-transform active:scale-90"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
+                          I accept the terms and conditions
+                        </FormLabel>
+                      </div>
                       <FormMessage className="text-[10px] font-bold" />
                     </FormItem>
                   )}

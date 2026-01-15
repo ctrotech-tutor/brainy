@@ -92,7 +92,7 @@ export const columns: ColumnDef<Institution>[] = [
       const institution = row.original;
       return (
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center shrink-0">
+          <div className="h-8 w-8 rounded-lg bg-accent text-primary/60 border border-border flex items-center justify-center shrink-0">
             <Building2 className="h-4 w-4 text-primary/60" />
           </div>
           <div className="flex flex-col">
@@ -156,23 +156,23 @@ export const columns: ColumnDef<Institution>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10 transition-all">
+            <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-accent border border-transparent hover:border-border transition-all">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4 opacity-40" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 border-white/10 bg-black/60 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl">
+          <DropdownMenuContent align="end" className="w-56 border-border bg-popover/80 backdrop-blur-2xl rounded-2xl p-2 shadow-2xl">
             <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 px-3 py-2">Node Operations</DropdownMenuLabel>
-            <DropdownMenuItem asChild className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest focus:bg-white/5 transition-all">
+            <DropdownMenuItem asChild className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest focus:bg-accent transition-all">
               <Link href={`/platform/institutions/review/${institution.id}`} className="flex items-center gap-3">
                 <FileSearch className="h-4 w-4 opacity-60" />
                 Review Manifest
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest focus:bg-white/5 transition-all">
+            <DropdownMenuItem className="rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest focus:bg-accent transition-all">
               Edit Parameters
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-white/5 mx-2" />
+            <DropdownMenuSeparator className="bg-border mx-2" />
             <DropdownMenuItem className="rounded-xl px-3 py-2 text-xs font-black uppercase tracking-widest text-rose-500 focus:bg-rose-500/10 focus:text-rose-500 transition-all">
               <ShieldAlert className="h-4 w-4 mr-3" />
               Sever Connection

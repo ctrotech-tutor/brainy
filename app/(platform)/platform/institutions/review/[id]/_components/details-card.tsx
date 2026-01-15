@@ -42,7 +42,7 @@ const DetailItem = ({
   if (value === null || value === undefined || value === "") return null;
 
   return (
-    <div className="group flex flex-col gap-1.5 p-4 rounded-2xl border border-white/5 bg-white/[0.02] transition-colors hover:bg-white/[0.05]">
+    <div className="group flex flex-col gap-1.5 p-4 rounded-2xl border border-border bg-card transition-colors hover:bg-accent">
       <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 group-hover:text-primary transition-colors">
         {Icon && <Icon className="h-3 w-3" />}
         {label}
@@ -57,7 +57,7 @@ const DetailItem = ({
 
 export function InstitutionDetailsCard({ institution }: DetailsCardProps) {
   return (
-    <Card className="relative overflow-hidden rounded-[2.5rem] border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
+    <Card className="relative overflow-hidden rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       <CardHeader className="pb-8 space-y-1">
         <div className="flex items-center justify-between">
@@ -81,7 +81,7 @@ export function InstitutionDetailsCard({ institution }: DetailsCardProps) {
           <DetailItem label="Identity Liaison" value={institution.contactEmail} icon={Mail} />
         </div>
 
-        <div className="p-6 rounded-2xl bg-primary/5 border border-primary/10 space-y-3">
+        <div className="p-6 rounded-2xl bg-accent text-primary border border-border space-y-3">
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
             <ShieldCheck className="h-4 w-4" />
             Security Validation Active

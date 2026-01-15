@@ -45,12 +45,12 @@ export default function InstitutionReviewClient() {
     return (
       <div className="space-y-10">
         <div className="space-y-3">
-          <Skeleton className="h-4 w-32 bg-white/5" />
-          <Skeleton className="h-10 w-96 bg-white/5" />
-          <Skeleton className="h-4 w-64 bg-white/5" />
+          <Skeleton className="h-4 w-32 bg-muted/20" />
+          <Skeleton className="h-10 w-96 bg-muted/20" />
+          <Skeleton className="h-4 w-64 bg-muted/20" />
         </div>
         <div className="mx-auto max-w-4xl">
-          <Skeleton className="h-[600px] w-full rounded-[2.5rem] bg-white/5" />
+          <Skeleton className="h-[600px] w-full rounded-[2.5rem] bg-muted/20" />
         </div>
       </div>
     );
@@ -58,7 +58,7 @@ export default function InstitutionReviewClient() {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-white/10 bg-white/5 py-24 text-center">
+      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-border bg-card/50 py-24 text-center">
         <div className="h-20 w-20 rounded-3xl bg-destructive/10 flex items-center justify-center mb-6">
           <AlertCircle className="h-10 w-10 text-destructive" />
         </div>
@@ -90,7 +90,7 @@ export default function InstitutionReviewClient() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md mr-2">
+          <div className="hidden sm:flex items-center gap-3 px-4 py-2 rounded-2xl bg-card border border-border backdrop-blur-md mr-2">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Audit active</span>
           </div>

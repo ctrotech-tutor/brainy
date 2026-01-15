@@ -24,14 +24,14 @@ const roleStyles: Record<string, string> = {
 
 export function UserRolesCard({ roles }: { roles: string[] }) {
   return (
-    <Card className="relative overflow-hidden rounded-[2.5rem] border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl">
+    <Card className="relative overflow-hidden rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       <CardHeader className="pb-6">
         <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-[10px] mb-2">
           <Shield className="h-3.5 w-3.5" />
           Authorization Manifest
         </div>
-        <CardTitle className="text-xl font-black tracking-tighter text-white uppercase leading-none">
+        <CardTitle className="text-xl font-black tracking-tighter text-foreground uppercase leading-none">
           Identity <span className="text-primary italic">Roles.</span>
         </CardTitle>
         <CardDescription className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest mt-2 leading-relaxed">
@@ -51,13 +51,13 @@ export function UserRolesCard({ roles }: { roles: string[] }) {
               </Badge>
             ))
           ) : (
-            <div className="w-full p-4 rounded-xl border border-dashed border-white/10 text-center">
+            <div className="w-full p-4 rounded-xl border border-dashed border-border text-center">
               <p className="text-[10px] font-bold text-muted-foreground/30 uppercase tracking-widest italic">No roles assigned.</p>
             </div>
           )}
         </div>
 
-        <div className="pt-4 border-t border-white/5">
+        <div className="pt-4 border-t border-border">
           <div className="flex items-center gap-2 mb-4 text-[9px] font-black uppercase tracking-widest text-muted-foreground/20">
             <Sparkles className="h-3 w-3" />
             Live permissions sync
@@ -65,7 +65,7 @@ export function UserRolesCard({ roles }: { roles: string[] }) {
           <Button
             variant="outline"
             size="sm"
-            className="w-full rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest h-10 gap-2 transition-all active:scale-95"
+            className="w-full rounded-xl border-border bg-card hover:bg-accent text-[10px] font-black uppercase tracking-widest h-10 gap-2 transition-all active:scale-95"
             onClick={() => {
               alert("Edit Permissions flow is managed via the directory manifest table.");
             }}

@@ -16,7 +16,7 @@ interface DocumentsCardProps {
 
 export function DocumentsCard({ documents }: DocumentsCardProps) {
   return (
-    <Card>
+    <Card className="rounded-[2.5rem] border-border bg-card/50 backdrop-blur-xl shadow-2xl">
       <CardHeader>
         <CardTitle>Supporting Documents</CardTitle>
         <CardDescription>
@@ -27,7 +27,7 @@ export function DocumentsCard({ documents }: DocumentsCardProps) {
         {documents && documents.length > 0 ? (
           <ul className="grid gap-3">
             {documents.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between rounded-lg border p-3">
+              <li key={doc.id} className="flex items-center justify-between rounded-xl border border-border bg-card p-3">
                 <div className="flex items-center gap-3">
                   <FileText className="h-6 w-6 text-muted-foreground" />
                   <div className="grid gap-0.5">
@@ -47,7 +47,7 @@ export function DocumentsCard({ documents }: DocumentsCardProps) {
           </ul>
         ) : (
           // --- Empty State ---
-          <div className="flex h-24 items-center justify-center rounded-lg border-2 border-dashed">
+          <div className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/10">
             <p className="text-sm text-muted-foreground">No documents were uploaded.</p>
           </div>
         )}
