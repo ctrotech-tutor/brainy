@@ -6,6 +6,7 @@ import { requireAuth } from "@/lib/auth";
 import { RoleGuard } from "@/lib/utils/roles";
 import { eq, and, ilike, count, SQL } from "drizzle-orm";
 import { z } from "zod";
+import { Cache } from "@/lib/cache";
 
 // 2. Create a robust Zod schema using the imported enum
 const querySchema = z.object({
@@ -39,6 +40,14 @@ export async function GET(req: NextRequest) {
     const { page, limit, name, status } = validation.data;
     const offset = (page - 1) * limit;
 
+    // Cache logic
+    const CACHE_KEY = Cache.key("platform", "institutions", page, limit, name || "all", status || "all");
+    const cached = await Cache.get<any>(CACHE_KEY);
+
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
     // --- Dynamic Query Construction ---
     const whereClauses: (SQL | undefined)[] = [
       name ? ilike(institutions.name, `%${name}%`) : undefined,
@@ -68,8 +77,7 @@ export async function GET(req: NextRequest) {
     const totalResults = total[0].value;
     const totalPages = Math.ceil(totalResults / limit);
 
-    // --- Response ---
-    return NextResponse.json({
+    const responseData = {
       data,
       pagination: {
         currentPage: page,
@@ -77,7 +85,13 @@ export async function GET(req: NextRequest) {
         totalResults,
         limit,
       },
-    });
+    };
+
+    // Cache for 1 hour
+    await Cache.set(CACHE_KEY, responseData, 3600);
+
+    // --- Response ---
+    return NextResponse.json(responseData);
   } catch (error) {
     if (error instanceof Error && error.message.includes("Forbidden")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

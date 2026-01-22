@@ -9,6 +9,7 @@ import { ResetPasswordEmail } from "../../emails/reset-password";
 import { TutorInvitationEmail } from "../../emails/tutor-invitation";
 import { InstitutionVerificationEmail } from "../../emails/institution-verification";
 import { StudentOTPEmail } from "../../emails/student-otp";
+import { NewsletterVerificationEmail } from "../../emails/newsletter-verification";
 import { LeadReplyEmail } from "../../emails/lead-reply";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -42,15 +43,16 @@ async function sendEmail({
   to: string;
   subject: string;
   template: React.ReactElement;
+  html?: string; // Optional raw HTML override
 }) {
-  const html = await render(template);
+  const htmlContent = template ? await render(template) : "";
   
   try {
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
       subject,
-      html,
+      html: htmlContent || undefined, // Use rendered template
     });
   } catch (error) {
     console.error(`Failed to send email to ${to} with subject "${subject}":`, error);
@@ -155,4 +157,46 @@ export async function sendLeadReplyEmail(
       content: replyContent,
     }),
   });
+}
+
+export async function sendNewsletterVerificationEmail(
+  email: string,
+  token: string
+): Promise<void> {
+  const verificationUrl = `${APP_URL}/newsletter/verify?token=${token}`;
+
+  await sendEmail({
+    to: email,
+    subject: "Confirm your Brainy subscription",
+    template: React.createElement(NewsletterVerificationEmail, {
+      url: verificationUrl,
+    }),
+  });
+}
+
+export async function sendNewsletterBroadcast(
+  to: string,
+  subject: string,
+  content: string, // HTML content
+  unsubscribeToken: string
+): Promise<void> {
+    // Direct usage of transporter for raw HTML content + wrapper if needed
+    // Wrapper could be added here, e.g. a simple email shell
+    const date = new Date().getFullYear();
+    const wrappedContent = `
+      <div style="font-family: sans-serif; color: #333; line-height: 1.6;">
+        ${content}
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+        <p style="font-size: 12px; color: #888; text-align: center;">
+          &copy; ${date} Brainy OS. <a href="${APP_URL}/newsletter/unsubscribe?token=${unsubscribeToken}" style="color: #888;">Unsubscribe</a>
+        </p>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      to,
+      subject,
+      html: wrappedContent,
+    });
 }

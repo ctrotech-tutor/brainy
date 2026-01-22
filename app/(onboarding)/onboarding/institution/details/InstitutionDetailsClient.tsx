@@ -16,7 +16,9 @@ import {
 } from "./_hooks/useInstitutionForm";
 import { Step1_SelectCountry } from "./_components/Step1_SelectCountry";
 import { Step2_SelectInstitution } from "./_components/Step2_SelectInstitution";
-import { Step3_AdminDetails } from "./_components/Step3_AdminDetails";
+import { Step3_Identity } from "./_components/Step3_Identity";
+import { Step4_Regulatory } from "./_components/Step4_Regulatory";
+import { Step5_AccessContact } from "./_components/Step5_AccessContact";
 
 // UI Imports
 import { Button } from "@/components/ui/button";
@@ -57,19 +59,31 @@ export default function InstitutionDetailsClient() {
       number: 1,
       title: "Jurisdiction Node",
       component: <Step1_SelectCountry />,
-      fields: ["country", "institutionType"] as const,
+      fields: ["state", "lga", "institutionType"] as const,
     },
     {
       number: 2,
       title: "Entity Identification",
       component: <Step2_SelectInstitution />,
-      fields: ["name", "domain"] as const,
+      fields: ["name", "domain", "logo", "website", "ownership", "yearEstablished"] as const,
     },
     {
       number: 3,
-      title: "Authorization Node",
-      component: <Step3_AdminDetails />,
-      fields: ["adminEmail"] as const,
+      title: "Identity Parameters",
+      component: <Step3_Identity />,
+      fields: ["shortName", "motto", "description", "mission", "vision"] as const,
+    },
+    {
+      number: 4,
+      title: "Regulatory Protocols",
+      component: <Step4_Regulatory />,
+      fields: ["nucCode", "nbteCode", "accreditationNumber", "studentPopulation"] as const,
+    },
+    {
+      number: 5,
+      title: "Access & Logistics",
+      component: <Step5_AccessContact />,
+      fields: ["adminEmail", "phoneNumber", "alternativePhone", "address"] as const,
     },
   ];
 
@@ -108,7 +122,7 @@ export default function InstitutionDetailsClient() {
       </motion.div>
 
       <FormProvider {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-8">
           <div className="relative p-8 rounded-[2.5rem] bg-card/30 border border-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1.5 bg-white/5">
               <motion.div

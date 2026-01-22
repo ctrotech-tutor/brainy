@@ -7,6 +7,7 @@ import { RoleGuard } from "@/lib/utils/roles";
 import { eq, and, count, SQL, sql } from "drizzle-orm";
 import { z } from "zod";
 import { ApiResponses } from "@/lib/api-response";
+import { Cache } from "@/lib/cache";
 
 // Zod schema for validating query parameters
 const querySchema = z.object({
@@ -35,11 +36,14 @@ export async function GET(req: NextRequest) {
     const { page, limit, query } = validation.data;
     const offset = (page - 1) * limit;
 
+    const CACHE_KEY = Cache.key("platform", "users", page, limit, query || "all");
+    const cached = await Cache.get<any>(CACHE_KEY);
+    if (cached) return ApiResponses.success(cached);
+
     // --- Dynamic Query Construction ---
     const whereClauses: (SQL | undefined)[] = [
       query
-        ? sql`(${users.name} ILIKE ${`%${query}%`} OR ${
-            users.email
+        ? sql`(${users.name} ILIKE ${`%${query}%`} OR ${users.email
           } ILIKE ${`%${query}%`})`
         : undefined,
     ];
@@ -80,9 +84,7 @@ export async function GET(req: NextRequest) {
     const totalResults = total[0].value;
     const totalPages = Math.ceil(totalResults / limit);
 
-    // --- Response ---
-    // --- Response ---
-    return ApiResponses.success({
+    const responseData = {
       data,
       pagination: {
         currentPage: page,
@@ -90,7 +92,13 @@ export async function GET(req: NextRequest) {
         totalResults,
         limit,
       },
-    });
+    };
+
+    await Cache.set(CACHE_KEY, responseData, 300); // 5 minutes
+
+    // --- Response ---
+    // --- Response ---
+    return ApiResponses.success(responseData);
   } catch (error) {
     return ApiResponses.handleError(error);
   }

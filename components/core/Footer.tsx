@@ -11,9 +11,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const subscribeToNewsletter = async (email: string): Promise<{ message: string }> => {
-  const { data } = await axios.post("/api/newsletter/subscribe", { email });
-  return data;
+import { subscribeToNewsletter } from "@/app/_actions/newsletter-actions";
+
+const subscribeAction = async (email: string): Promise<{ message: string }> => {
+  const formData = new FormData();
+  formData.append("email", email);
+
+  const result = await subscribeToNewsletter(null, formData); // Pass null as generic prevState
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+  return { message: result.message || "Subscribed successfully!" };
 };
 
 // Updated and reorganized footer links for a cleaner structure
@@ -62,7 +72,7 @@ const Footer = () => {
 
   // --- 1. SET UP THE MUTATION WITH TANSTACK QUERY v5 ---
   const { mutate, isPending, isSuccess } = useMutation({
-    mutationFn: subscribeToNewsletter,
+    mutationFn: subscribeAction,
     onSuccess: (data) => {
       // On success, show a success toast and clear the input.
       toast.success(data.message || "Thanks for subscribing!");
@@ -70,9 +80,9 @@ const Footer = () => {
       // You could optionally invalidate queries here if needed, e.g.,
       // queryClient.invalidateQueries({ queryKey: ['subscribers'] });
     },
-    onError: (error: AxiosError<{ error: string }>) => {
+    onError: (error: Error) => {
       // On error, show an error toast with the message from the API.
-      const errorMessage = error.response?.data?.error || "An error occurred. Please try again.";
+      const errorMessage = error.message || "An error occurred. Please try again.";
       toast.error(errorMessage);
     },
   });

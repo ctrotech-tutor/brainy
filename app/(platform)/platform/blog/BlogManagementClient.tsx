@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DataTable } from "../institutions/pending/_components/data-table";
+import { DataTable } from "../../_components/data-table";
 import { columns } from "./_components/columns";
 
 export default function BlogManagementClient() {
@@ -43,6 +43,7 @@ export default function BlogManagementClient() {
                     queryKey="blog-posts"
                     filterColumn="title"
                     filterPlaceholder="Search posts..."
+                    staleTime={1000 * 60 * 15} // 15 minutes
                 />
             </Suspense>
         </div>

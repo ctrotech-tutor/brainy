@@ -4,8 +4,7 @@
 import { Suspense } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { columns } from "./_components/columns";
-import { DataTable } from "../institutions/pending/_components/data-table"; // Re-using the same data-table
-import { Skeleton } from "@/components/ui/skeleton";
+import { DataTable } from "../../_components/data-table";
 import { Building2, Filter } from "lucide-react";
 
 // UI Imports for the filter
@@ -17,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { institutionStatusEnum } from "@/db/schema"; // Import the enum for filter options
+import { DataTableSkeleton } from "../../_components/data-table-skeleton";
 
 // A small client component to manage the filter's state via URL
 function StatusFilter() {
@@ -93,7 +93,7 @@ export default function AllInstitutionsClient() {
         <StatusFilter />
       </div>
 
-      <Suspense fallback={<Skeleton className="h-[600px] w-full rounded-[3rem] bg-muted/20" />}>
+      <Suspense fallback={<DataTableSkeleton columnCount={columns.length} />}>
         <DataTable
           columns={columns}
           apiEndpoint="/api/platform/institutions"
@@ -101,6 +101,7 @@ export default function AllInstitutionsClient() {
           initialParams={initialParams}
           filterColumn="name"
           filterPlaceholder="Enter Node Identity..."
+          staleTime={1000 * 60 * 60} // 1 hour
         />
       </Suspense>
     </div>

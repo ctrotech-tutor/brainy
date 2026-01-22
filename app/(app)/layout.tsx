@@ -1,79 +1,54 @@
-// Remove "use client" - this is now a Server Component
+// app/(app)/layout.tsx
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Brain, LayoutDashboard, Settings, User } from "lucide-react";
-
-// --- 1. Import your authentication and new UserNav component ---
+import { Brain } from "lucide-react";
 import { validateRequest } from "@/lib/auth";
 import { UserNav } from "@/components/auth/UserNav";
+import { BackgroundDecor } from "@/components/core/background-decor";
 
-// A simple component for sidebar navigation links (no changes needed here)
-const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-}) => (
-  <Link
-    href={href}
-    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:bg-accent hover:text-primary"
-  >
-    <Icon className="h-5 w-5" />
-    {label}
-  </Link>
-);
-
-// --- 2. Make the layout component async ---
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  // --- 3. Fetch the user session on the server ---
   const { user } = await validateRequest();
 
-  // --- 4. If no user, redirect to the login page ---
   if (!user) {
-    return redirect("/login");
+    return redirect("/auth/login");
   }
 
-  // --- 5. If user exists, render the layout ---
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[240px_1fr]">
-      {/* --- Sidebar (Desktop) --- */}
-      <aside className="hidden border-r bg-background md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-16 items-center border-b px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <Brain className="h-6 w-6 text-primary" />
-              <span>Brainy</span>
-            </Link>
-          </div>
-          <div className="flex-1 overflow-auto py-2">
-            <nav className="grid items-start px-4 text-sm font-medium">
-              <SidebarLink href="/dashboard" icon={LayoutDashboard} label="Dashboard" />
-              <SidebarLink href="/dashboard/profile" icon={User} label="Profile" />
-              <SidebarLink href="/dashboard/settings" icon={Settings} label="Settings" />
-            </nav>
+    <div className="relative min-h-screen w-full bg-background flex flex-col">
+      <BackgroundDecor variant="emerald" />
+
+      {/* Slim, Minimalist Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-background/50 backdrop-blur-3xl">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-7xl mx-auto">
+          <Link href="/" className="flex items-center gap-2 group transition-all">
+            <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:scale-110 transition-transform">
+              <Brain className="h-5 w-5 text-primary" />
+            </div>
+            <span className="font-black tracking-tighter text-lg uppercase italic group-hover:text-primary transition-colors">
+              Brainy.
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-6">
+            <UserNav />
           </div>
         </div>
-      </aside>
+      </header>
 
-      {/* --- Main Content Area --- */}
-      <div className="flex flex-col">
-        {/* --- Header --- */}
-        <header className="flex h-16 items-center gap-4 border-b bg-background px-6">
-          <div className="flex-1">
-            {/* You can add a mobile sidebar trigger or search bar here */}
-          </div>
-          {/* --- 6. Render the UserNav client component with the user data --- */}
-          <UserNav/>
-        </header>
-
-        {/* --- Page Content --- */}
-        <main className="flex-1 overflow-y-auto p-6">
+      {/* Main content centered for standard dashboard experience */}
+      <main className="relative flex-1 flex flex-col items-center justify-center p-4 md:p-8 lg:p-12">
+        <div className="w-full max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700">
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
+
+      {/* System Status Footer */}
+      <footer className="w-full border-t border-white/5 py-4">
+        <div className="container flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">
+          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Neural Link: Secure
+        </div>
+      </footer>
     </div>
   );
 }

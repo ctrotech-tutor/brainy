@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { columns } from "./_components/columns";
-import { DataTable } from "./_components/data-table";
+import { DataTable } from "../../../_components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShieldCheck } from "lucide-react";
 

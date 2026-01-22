@@ -278,3 +278,18 @@ Google OAuth callback error: TypeError: Headers.append: "Bearer accessToken() {
 
 
 cool .. .so now can we now implement a real notification badge  ... e.g  when a new institution is registerd then should be an indictor in our platform admin, when there a new user, when they submit new lead and many more like that .. we should be receiving realtime stuffs in our admin pannel
+
+
+"so now ... i want us now now focus next on this@status i think current every thing on the status page are hardcoded so now lets make all this fully functional and stanadard and proction ready and ho win dustries does it and all ....and make sure all is real and real tim e and more and fully functional and not mocked ...... so now i think curently we have all these compoennets : "const components = [
+  { name: "Brainy Core API", status: "operational", uptime: "99.98%", icon: Activity },
+  { name: "Database Cluster", status: "operational", uptime: "100%", icon: Database },
+  { name: "Authentication Service", status: "operational", uptime: "99.99%", icon: Lock },
+  { name: "AI Question Engine", status: "operational", uptime: "99.95%", icon: Cpu },
+  { name: "File Storage & Static Assets", status: "operational", uptime: "100%", icon: ShieldCheck },
+  { name: "Real-time Notifications", status: "operational", uptime: "99.90%", icon: RefreshCcw },
+];" .. apart from the ai question enging we can hardcode that for now ... so nwo lets make all these real ... make sure every sigle thing ar efully functional and never mocked and also i want to tell you that i have sentry setup ... so just fully do the needful .. make sure sure you fully inspecct every single stuffs in our whole application so you can alwasy be sure of the nexxt step and be confident every step you are going to take through full understnading of the project"
+
+
+"now if we fully crosscheck the status page .... a lot and somethings are stilll hard codeded .. .alos i dont really understand the api .. .how surely do we check auth services, dataabase, the storage services an all, te notifications / email services (lets rename to email servies) .... and and as well the brainy core api .... how do we reall do this and ure that is not hard code or nnot even syncing with waht we have on our platform ... please make sure all is ral  ... and there some other there as well the global response latency graph ( performace graph) ... you can remove the past incident section ...just make usre we do thing the right way and lets be rela withour self and not jsut taking shorcut and all... also you can use tanstack query as it set up in our project alredy .. insted of using fet or sth like that ... pleast just be and make sure all this are not fakked lazily but real."
+
+so now lets take a look at the institution onboarding stuffs ... .and now lets began to think and analyse take a look at the instituin relaed schema and all ... and the onboarding and all..  .... just take a look at what we are only retriving and all ... i dont ven know hoew to explain my self there are more field in the db but the onboarding is kind of and all ... of that ... please lets began to crosscheck and all of that.

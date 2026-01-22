@@ -8,6 +8,7 @@ export type NavItem = {
 export const navLinks: NavItem[] = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
+  { href: "/pricing", label: "Pricing" },
   {
     label: "Audience",
     href: "#audience", // Main link scrolls to the start of the group

@@ -1,8 +1,6 @@
 // app/api/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
-import { requireAuth } from "@/lib/auth";
-import { RoleGuard } from "@/lib/utils/roles";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -13,9 +11,6 @@ cloudinary.config({
 
 export async function POST(req: NextRequest) {
   try {
-    // Require authentication and admin role
-    const { user } = await requireAuth();
-    await RoleGuard.requireRole(user.id, "PLATFORM_ADMIN");
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -35,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(dataURI, {
-      folder: "brainy-blog",
+      folder: "brainy-uploads",
       resource_type: "auto",
       transformation: [
         { width: 1920, height: 1080, crop: "limit" },

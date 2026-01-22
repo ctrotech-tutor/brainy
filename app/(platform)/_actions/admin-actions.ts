@@ -1,35 +1,31 @@
 "use server";
 
 import { db } from "@/db";
-import { institutions, marketingLeads } from "@/db/schema";
-import { eq, and, isNull } from "drizzle-orm";
-import { validateRequest } from "@/lib/auth";
+import { institutions, marketingLeads, notifications } from "@/db/schema";
+import { count, eq, and, isNull } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth";
 
 export async function getAdminNotificationCounts() {
-  const { user } = await validateRequest();
+  const { user } = await requireAuth();
 
-  if (!user || (!user.roles.includes("PLATFORM_ADMIN"))) {
-    return { pendingInstitutions: 0, unrepliedLeads: 0 };
-  }
-
-  try {
-    // Institution statuses are uppercase in schema.ts
-    const pendingInstitutionsList = await db
-      .select({ id: institutions.id })
+  const [pending, unreplied, unreadNotes] = await Promise.all([
+    db
+      .select({ value: count() })
       .from(institutions)
-      .where(eq(institutions.status, "PENDING"));
-
-    const unrepliedLeadsList = await db
-      .select({ id: marketingLeads.id })
+      .where(eq(institutions.status, "PENDING")),
+    db
+      .select({ value: count() })
       .from(marketingLeads)
-      .where(and(isNull(marketingLeads.repliedAt), isNull(marketingLeads.seenAt)));
+      .where(and(isNull(marketingLeads.repliedAt), isNull(marketingLeads.seenAt))),
+    db
+      .select({ value: count() })
+      .from(notifications)
+      .where(and(eq(notifications.recipientId, user.id), eq(notifications.isRead, false))),
+  ]);
 
-    return {
-      pendingInstitutions: pendingInstitutionsList.length,
-      unrepliedLeads: unrepliedLeadsList.length,
-    };
-  } catch (error) {
-    console.error("Error fetching notification counts:", error);
-    return { pendingInstitutions: 0, unrepliedLeads: 0 };
-  }
+  return {
+    pendingInstitutions: pending[0].value,
+    unrepliedLeads: unreplied[0].value,
+    unreadNotifications: unreadNotes[0].value,
+  };
 }

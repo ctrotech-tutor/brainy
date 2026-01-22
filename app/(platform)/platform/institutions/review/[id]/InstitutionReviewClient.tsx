@@ -9,7 +9,7 @@ import { getErrorMessage } from "@/lib/utils";
 // Import UI and Child Components
 import { Skeleton } from "@/components/ui/skeleton";
 import { InstitutionDetailsCard } from "./_components/details-card";
-import { InstitutionActions } from "@/components/platform/InstitutionActions";
+import { InstitutionActions } from "@/app/(platform)/platform/institutions/_components/InstitutionActions";
 import { AlertCircle, FileSearch, Sparkles } from "lucide-react";
 
 import type { InstitutionReviewData } from "@/app/(platform)/_types";

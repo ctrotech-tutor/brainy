@@ -57,6 +57,20 @@
       "when": 1768480630012,
       "tag": "0007_amusing_sumo",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1768513832922,
+      "tag": "0008_wealthy_sharon_carter",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1768821102564,
+      "tag": "0009_far_switch",
+      "breakpoints": true
     }
   ]
 }

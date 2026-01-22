@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { CookieConsent } from "@/components/core/CookieConsent";
+import { NetworkStatus } from "@/components/ui/network-status";
 
 // --- METADATA & VIEWPORT ---
 export const metadata: Metadata = {
@@ -123,7 +124,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="light"
+            defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
@@ -133,6 +134,7 @@ export default function RootLayout({
             {/* Smooth page transitions */}
             <div>{children}</div>
             <CookieConsent />
+            <NetworkStatus />
           </ThemeProvider>
         </QueryProvider>
       </body>

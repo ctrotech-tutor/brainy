@@ -1,12 +1,10 @@
 // app/(platform)/platform/leads/page.tsx
-import { db } from "@/db";
-import { marketingLeads } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { Metadata } from "next";
 import { requireAuth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { LeadsClient } from "./LeadsClient";
 
-export const metadata = {
+export const metadata: Metadata = {
     title: "Lead Management | Platform Admin",
     description: "Manage and respond to marketing leads and inquiries.",
 };
@@ -18,9 +16,5 @@ export default async function LeadsPage() {
         redirect("/dashboard");
     }
 
-    const leads = await db.query.marketingLeads.findMany({
-        orderBy: [desc(marketingLeads.createdAt)],
-    });
-
-    return <LeadsClient initialLeads={leads as any} />;
+    return <LeadsClient />;
 }

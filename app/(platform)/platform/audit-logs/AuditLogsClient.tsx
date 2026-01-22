@@ -3,7 +3,7 @@
 
 import { Suspense } from "react";
 import { getColumns } from "./_components/columns";
-import { DataTable } from "../institutions/pending/_components/data-table";
+import { DataTable } from "../../_components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { History, ShieldAlert } from "lucide-react";
 
@@ -36,6 +36,7 @@ export default function AuditLogsClient() {
           queryKey="audit-logs"
           filterColumn="query"
           filterPlaceholder="Enter Action or Actor Identity..."
+          staleTime={1000 * 60} // 1 minute
         />
       </Suspense>
     </div>

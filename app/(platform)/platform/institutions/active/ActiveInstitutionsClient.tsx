@@ -2,7 +2,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { DataTable } from "../pending/_components/data-table";
+import { DataTable } from "../../../_components/data-table";
 import { columns } from "../_components/columns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, CheckCircle2 } from "lucide-react";

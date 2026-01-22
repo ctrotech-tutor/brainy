@@ -36,10 +36,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronDown, Loader2, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { AlertTriangle, ChevronDown, Loader2, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { ApiResponse } from "@/app/(platform)/_types";
+import { InfoBlock } from "./info-block";
 
 const fetchPaginatedData = async <TData,>(url: string): Promise<ApiResponse<TData>> => {
   const { data } = await axios.get(url);
@@ -63,6 +64,8 @@ interface DataTableProps<TData, TValue> {
   filterColumn: string;
   filterPlaceholder: string;
   initialParams?: Record<string, string>;
+  staleTime?: number;
+  gcTime?: number;
 }
 
 export function DataTable<TData, TValue>({
@@ -73,6 +76,8 @@ export function DataTable<TData, TValue>({
   filterColumn,
   filterPlaceholder,
   initialParams = {},
+  staleTime,
+  gcTime,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -146,6 +151,8 @@ export function DataTable<TData, TValue>({
     queryKey: [queryKey, apiUrl],
     queryFn: () => fetchPaginatedData(apiUrl),
     placeholderData: keepPreviousData,
+    staleTime,
+    gcTime,
   });
 
   const tableData = React.useMemo(() => data?.data ?? [], [data]);
@@ -224,17 +231,19 @@ export function DataTable<TData, TValue>({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-[3rem] border border-dashed border-border bg-card/50 py-12 text-center">
-        <div className="h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
-          <Loader2 className="h-8 w-8 text-destructive animate-spin" />
+      <div className="space-y-6">
+        <InfoBlock
+          Icon={AlertTriangle}
+          title="Signal Lost"
+          description={error instanceof Error ? error.message : "An unknown error occurred. Please check the connection."}
+          iconContainerClassName="bg-destructive/10"
+          className="py-12"
+        />
+        <div className="flex justify-center">
+          <Button variant="outline" size="sm" className="rounded-xl border-border bg-card" onClick={() => refetch()}>
+            Retry Sequence
+          </Button>
         </div>
-        <h3 className="text-sm font-black tracking-widest text-destructive uppercase">Audit Interrupted</h3>
-        <p className="mt-2 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em]">
-          {error instanceof Error ? error.message : "An unknown error occurred"}
-        </p>
-        <Button variant="outline" size="sm" className="mt-6 rounded-xl border-border bg-card" onClick={() => refetch()}>
-          Retry Sequence
-        </Button>
       </div>
     );
   }
@@ -313,11 +322,13 @@ export function DataTable<TData, TValue>({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={resolvedColumns.length} className="h-32 text-center">
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground/20">
-                      <Sparkles className="h-8 w-8" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em]">No registry entries found.</span>
-                    </div>
+                  <TableCell colSpan={resolvedColumns.length}>
+                    <InfoBlock
+                      Icon={Sparkles}
+                      title="Registry Clear"
+                      description="No entries match the current criteria. Try adjusting your filters or search terms."
+                      className="py-12"
+                    />
                   </TableCell>
                 </TableRow>
               )}

@@ -11,6 +11,7 @@ import SecuritySection from "@/components/main/sections/security";
 import CtaSection from "@/components/main/sections/CTA";
 import Footer from "@/components/core/Footer";
 import WhyBrainySection from "@/components/main/sections/why-brainy";
+import PricingSection from "@/components/main/sections/pricing";
 
 import { validateRequest } from "@/lib/auth";
 
@@ -34,6 +35,7 @@ export default async function Home() {
         <InstitutionSystemSection />
         <SecuritySection />
         <WhyBrainySection />
+        <PricingSection />
         <CtaSection />
       </main>
       <Footer />

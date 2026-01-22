@@ -3,7 +3,7 @@
 
 import { Suspense } from "react";
 import { getColumns } from "./_components/column";
-import { DataTable } from "../institutions/pending/_components/data-table";
+import { DataTable } from "../../_components/data-table";
 import { EditRolesModal } from "../../_components/edit-roles-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users2, Sparkles } from "lucide-react";

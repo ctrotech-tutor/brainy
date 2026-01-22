@@ -29,13 +29,13 @@ import Link from "next/link";
 import { updateLeadStatus, submitLeadReply } from "@/app/(platform)/_actions/lead-actions";
 import { cn } from "@/lib/utils";
 
-interface ReplyEntry {
+export interface ReplyEntry {
     content: string;
     sentAt: string;
     sentBy: string;
 }
 
-interface Lead {
+export interface Lead {
     id: string;
     name: string;
     email: string;

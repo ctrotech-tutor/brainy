@@ -5,6 +5,7 @@ import { validateRequest } from "@/lib/auth";
 import { RoleGuard } from "@/lib/utils/roles";
 import { eq, count, isNotNull, and, isNull } from "drizzle-orm";
 import { ApiResponses } from "@/lib/api-response";
+import { Cache } from "@/lib/cache";
 
 export async function GET() {
   try {
@@ -14,6 +15,13 @@ export async function GET() {
     }
 
     await RoleGuard.requireRole(user.id, "PLATFORM_ADMIN");
+
+    const CACHE_KEY = Cache.key("platform", "stats");
+    const cached = await Cache.get<any>(CACHE_KEY);
+
+    if (cached) {
+      return ApiResponses.success(cached);
+    }
 
     const [pendingInstitutions, activeInstitutions, totalUsers, totalStudents, unreadLeads] =
       await Promise.all([
@@ -40,13 +48,17 @@ export async function GET() {
           .where(and(isNull(marketingLeads.repliedAt), isNull(marketingLeads.seenAt))),
       ]);
 
-    return ApiResponses.success({
+    const data = {
       pendingInstitutions: pendingInstitutions[0].value,
       activeInstitutions: activeInstitutions[0].value,
       totalUsers: totalUsers[0].value,
       totalStudents: totalStudents[0].value,
       unreadLeads: unreadLeads[0].value,
-    });
+    };
+
+    await Cache.set(CACHE_KEY, data, 300); // 5 minutes
+
+    return ApiResponses.success(data);
   } catch (error) {
     return ApiResponses.handleError(error);
   }

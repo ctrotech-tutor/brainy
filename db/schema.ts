@@ -114,6 +114,26 @@ export const blogPostStatusEnum = pgEnum("blog_post_status", [
   "ARCHIVED",
 ]);
 
+export const newsletterStatusEnum = pgEnum("newsletter_status", [
+  "PENDING",
+  "ACTIVE",
+  "UNSUBSCRIBED",
+]);
+
+export const broadcastStatusEnum = pgEnum("broadcast_status", [
+  "DRAFT",
+  "PROCESSING",
+  "COMPLETED",
+  "FAILED",
+]);
+
+export const notificationTypeEnum = pgEnum("notification_type", [
+  "INFO",
+  "SUCCESS",
+  "WARNING",
+  "ERROR",
+]);
+
 // ------------------------------
 // AUTH & USERS
 // ------------------------------
@@ -595,6 +615,21 @@ export const auditLogs = pgTable("audit_logs", {
   metadata: jsonb("metadata"),
 });
 
+export const notifications = pgTable("notifications", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  recipientId: text("recipient_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: notificationTypeEnum("type").default("INFO").notNull(),
+  link: text("link"),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const legalDocuments = pgTable("legal_documents", {
   id: text("id")
     .primaryKey()
@@ -632,6 +667,36 @@ export const marketingLeads = pgTable("marketing_leads", {
 });
 
 // ------------------------------
+// NEWSLETTER SYSTEM
+// ------------------------------
+export const newsletterSubscribers = pgTable("newsletter_subscribers", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  email: text("email").notNull().unique(),
+  token: text("token").notNull().unique(), // Verification/Unsubscribe token
+  status: newsletterStatusEnum("status").default("PENDING").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  verifiedAt: timestamp("verified_at"),
+  unsubscribedAt: timestamp("unsubscribed_at"),
+});
+
+export const newsletterBroadcasts = pgTable("newsletter_broadcasts", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  subject: text("subject").notNull(),
+  content: text("content").notNull(), // Markdown or HTML
+  authorId: text("author_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  status: broadcastStatusEnum("status").default("DRAFT").notNull(),
+  recipientsCount: integer("recipients_count").default(0),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ------------------------------
 // BLOG SYSTEM
 // ------------------------------
 export const blogCategories = pgTable("blog_categories", {
@@ -654,11 +719,11 @@ export const blogPosts = pgTable("blog_posts", {
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(), // Markdown content
   coverImage: text("cover_image"),
-  
+
   // SEO & Metadata
   metaTitle: text("meta_title"),
   metaDescription: text("meta_description"),
-  
+
   // Author & Category
   authorId: text("author_id")
     .notNull()
@@ -666,15 +731,15 @@ export const blogPosts = pgTable("blog_posts", {
   categoryId: text("category_id").references(() => blogCategories.id, {
     onDelete: "set null",
   }),
-  
+
   // Publishing
   status: blogPostStatusEnum("status").default("DRAFT").notNull(),
   publishedAt: timestamp("published_at"),
-  
+
   // Analytics
   views: integer("views").default(0).notNull(),
   readingTime: integer("reading_time"), // in minutes
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -963,3 +1028,13 @@ export const blogPostTagsRelations = relations(blogPostTags, ({ one }) => ({
     references: [blogTags.id],
   }),
 }));
+
+export const newsletterBroadcastsRelations = relations(
+  newsletterBroadcasts,
+  ({ one }) => ({
+    author: one(users, {
+      fields: [newsletterBroadcasts.authorId],
+      references: [users.id],
+    }),
+  })
+);

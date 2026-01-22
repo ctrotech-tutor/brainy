@@ -1,4 +1,3 @@
-// app/(onboarding)/onboarding/institution/details/_components/Step2_SelectInstitution.tsx
 "use client";
 
 import { useState } from "react";
@@ -7,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { FullInstitutionInput } from "../_hooks/useInstitutionForm";
-import { Search, Globe, Link, Building } from "lucide-react";
+import { Search, Globe, Link, Building, AlertCircle } from "lucide-react";
 
 // UI Imports
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -15,55 +14,57 @@ import { Input } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FileUpload } from "@/components/forms/file-upload";
 
-import { InstitutionAPIResult } from "@/app/(onboarding)/_types";
+type NigerianUniversity = {
+  label: string;
+  value: string;
+  type: "Federal" | "State" | "Private";
+  url: string;
+  yearEstablished: string;
+};
 
-// API fetching functions for each source
-const fetchNigerianInstitutions = async (): Promise<InstitutionAPIResult[]> => {
+const fetchNigerianInstitutions = async (): Promise<NigerianUniversity[]> => {
   const { data } = await axios.get("/api/institutions/nigeria");
   return data;
 };
 
-const fetchGlobalInstitutions = async (country: string): Promise<InstitutionAPIResult[]> => {
-  const { data } = await axios.get(`/api/institutions/global?country=${country}`);
-  return data;
-};
-
 export const Step2_SelectInstitution = () => {
-  const { control, watch, setValue, resetField } = useFormContext<FullInstitutionInput>();
+  const { control, setValue, resetField } = useFormContext<FullInstitutionInput>();
   const [isManualEntry, setIsManualEntry] = useState(false);
 
-  const selectedCountry = watch("country");
-  const isNigeria = selectedCountry?.toLowerCase() === "nigeria";
-
-  // Query for Nigerian institutions (pre-fetched list)
-  const { data: nigerianInstitutions, isPending: isLoadingNigerian } = useQuery({
+  // Query for Nigerian institutions
+  const { data: nigerianInstitutions, isPending } = useQuery({
     queryKey: ["nigerianInstitutions"],
     queryFn: fetchNigerianInstitutions,
-    enabled: isNigeria,
-    staleTime: 1000 * 60 * 60, // 1 hour
-    gcTime: 1000 * 60 * 60, // 1 hours
-  });
-
-  // Query for Global institutions (pre-fetched list)
-  const { data: globalInstitutions, isPending: isLoadingGlobal } = useQuery({
-    queryKey: ["globalInstitutions", selectedCountry],
-    queryFn: () => fetchGlobalInstitutions(selectedCountry),
-    enabled: !!selectedCountry && !isNigeria,
     staleTime: 1000 * 60 * 60, // 1 hour
   });
-
-  const institutionOptions = isNigeria ? nigerianInstitutions : globalInstitutions;
-  const isLoading = isLoadingNigerian || isLoadingGlobal;
 
   const handleSelectInstitution = (value: string) => {
-    const selected = institutionOptions?.find(opt => opt.value === value);
+    const selected = nigerianInstitutions?.find(opt => opt.value === value);
     if (selected) {
+      // Auto-fill logic
       setValue("name", selected.label, { shouldValidate: true });
-      setValue("domain", selected.domain || "", { shouldValidate: true });
-      setValue("website", selected.website || "", { shouldValidate: true });
-      if (selected.yearEstablished) setValue("yearEstablished", selected.yearEstablished, { shouldValidate: true });
-      if (isNigeria && selected.type) setValue("ownership", selected.type.toUpperCase() as FullInstitutionInput['ownership']);
+      // Clean domain from URL if possible, or leave blank to force user input validation
+      // But standard is nice.
+      if (selected.url) {
+        try {
+          const hostname = new URL(selected.url).hostname.replace('www.', '');
+          setValue("domain", hostname, { shouldValidate: true });
+          setValue("website", selected.url, { shouldValidate: true });
+        } catch (e) {
+          // ignore invalid url
+        }
+      }
+      if (selected.yearEstablished) setValue("yearEstablished", parseInt(selected.yearEstablished), { shouldValidate: true });
+
+      // Map Type
+      let ownershipType = "OTHER";
+      if (selected.type === "Federal") ownershipType = "FEDERAL";
+      if (selected.type === "State") ownershipType = "STATE";
+      if (selected.type === "Private") ownershipType = "PRIVATE";
+
+      setValue("ownership", ownershipType as any);
     }
   };
 
@@ -86,6 +87,7 @@ export const Step2_SelectInstitution = () => {
     resetField("name");
     resetField("domain");
     resetField("website");
+    resetField("logo");
     setIsManualEntry(false);
   };
 
@@ -136,11 +138,11 @@ export const Step2_SelectInstitution = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {isLoading ? (
+                  {isPending ? (
                     <Skeleton className="h-12 w-full rounded-xl bg-white/5" />
                   ) : (
                     <Combobox
-                      options={Array.isArray(institutionOptions) ? institutionOptions : []}
+                      options={nigerianInstitutions || []}
                       value={field.value}
                       onChange={(value) => {
                         field.onChange(value);
@@ -148,7 +150,6 @@ export const Step2_SelectInstitution = () => {
                       }}
                       placeholder="Identify Institution..."
                       searchPlaceholder="Search Registry Database..."
-                      disabled={!selectedCountry || isLoading}
                       renderNotFound={renderManualEntryToggle()}
                       className="h-12 bg-white/5 border-white/10 rounded-xl transition-all focus:ring-primary/20"
                     />
@@ -175,7 +176,7 @@ export const Step2_SelectInstitution = () => {
                 <div className="relative">
                   <Input
                     {...field}
-                    placeholder="e.g. mit.edu"
+                    placeholder="e.g. uni.edu.ng"
                     disabled={!isManualEntry && !!field.value}
                     className="h-12 px-5 rounded-xl bg-white/5 border-white/5 focus-visible:ring-primary/20 transition-all font-bold placeholder:font-medium disabled:opacity-60"
                   />
@@ -197,7 +198,7 @@ export const Step2_SelectInstitution = () => {
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="https://institutional.edu"
+                  placeholder="https://www.uni.edu.ng"
                   disabled={!isManualEntry && !!field.value}
                   className="h-12 px-5 rounded-xl bg-white/5 border-white/5 focus-visible:ring-primary/20 transition-all font-bold placeholder:font-medium disabled:opacity-60"
                 />
@@ -207,6 +208,29 @@ export const Step2_SelectInstitution = () => {
           )}
         />
       </div>
+
+      {/* Logo Upload */}
+      <FormField
+        control={control}
+        name="logo"
+        render={({ field }) => (
+          <FormItem className="space-y-2">
+            <FormLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
+              <AlertCircle className="h-3 w-3" />
+              Entity Insignia (Logo)
+            </FormLabel>
+            <FormControl>
+              <FileUpload
+                value={field.value || ""}
+                onChange={field.onChange}
+                onRemove={() => field.onChange("")}
+                label="Upload Official Logo"
+              />
+            </FormControl>
+            <FormMessage className="text-[10px] font-bold" />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

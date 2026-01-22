@@ -1,4 +1,3 @@
-// app/(marketing)/pricing/PricingClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -10,11 +9,8 @@ import {
     Zap,
     Building2,
     Users,
-    ShieldCheck,
-    Cpu,
     Globe,
-    ArrowRight,
-    HelpCircle
+    ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -27,7 +23,7 @@ const tiers = [
         price: { monthly: "$0", yearly: "$0" },
         description: "Perfect for students looking to verify their skills globally.",
         features: [
-            "Access to public public mocks",
+            "Access to public mocks",
             "Global integrity rank",
             "Digital student badge",
             "Up to 5 individual attempts/mo",
@@ -77,26 +73,27 @@ const tiers = [
     }
 ];
 
-export function PricingClient() {
+export default function PricingSection() {
     const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
     return (
-        <div className="relative isolate overflow-hidden">
-            <Wrapper className="py-24 sm:py-32">
+        <section className="relative isolate overflow-hidden py-24 sm:py-32" id="pricing">
+            <Wrapper>
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-20">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                     >
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-6">
                             <Zap className="h-3 w-3" />
                             Flexible Plans
                         </div>
-                        <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground mb-8">
+                        <h2 className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground mb-8">
                             Predictable pricing for <span className="text-primary italic">modern education.</span>
-                        </h1>
+                        </h2>
                         <p className="text-xl text-muted-foreground leading-relaxed">
                             Choose the path that fits your academic goals. From individual students
                             to global organizations, Brainy scales with you.
@@ -203,47 +200,7 @@ export function PricingClient() {
                         </motion.div>
                     ))}
                 </div>
-
-                {/* FAQ - Quick Section */}
-                <div className="mt-32 max-w-4xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-black tracking-tight text-foreground flex items-center justify-center gap-3">
-                            <HelpCircle className="h-8 w-8 text-primary" />
-                            Frequently Asked Questions
-                        </h2>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {[
-                            { q: "Can I upgrade my plan later?", a: "Yes, you can upgrade from Student to Institution at any time. Your existing data will be migrated." },
-                            { q: "What is your refund policy?", a: "We offer a 14-day complete satisfaction guarantee for Institutional Pro subscriptions." },
-                            { q: "Do you offer education discounts?", a: "Institutional Pro is already priced for education. For non-profits, contact our sales team." },
-                            { q: "Is my institutional data safe?", a: "Absolutely. We use enterprise-grade encryption and follow strict Nigerian and international data laws." },
-                        ].map((faq, i) => (
-                            <div key={i} className="p-8 rounded-3xl bg-card border border-border backdrop-blur-md shadow-sm">
-                                <h4 className="font-bold text-foreground mb-3">{faq.q}</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Trust Badges */}
-                <div className="mt-32 pt-16 border-t border-border flex flex-wrap justify-center items-center gap-12 grayscale opacity-40 transition-all hover:grayscale-0 hover:opacity-100">
-                    <div className="flex items-center gap-2 font-black tracking-tighter text-xl">
-                        <ShieldCheck className="h-8 w-8 text-primary" />
-                        BRAINY SECURE
-                    </div>
-                    <div className="flex items-center gap-2 font-black tracking-tighter text-xl text-foreground">
-                        <Cpu className="h-8 w-8 text-primary" />
-                        AI POWERED
-                    </div>
-                    <div className="flex items-center gap-2 font-black tracking-tighter text-xl">
-                        <Globe className="h-8 w-8 text-primary" />
-                        EST. 2024
-                    </div>
-                </div>
             </Wrapper>
-        </div>
+        </section>
     );
 }

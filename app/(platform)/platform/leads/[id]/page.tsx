@@ -1,10 +1,9 @@
-// app/(platform)/platform/leads/[id]/page.tsx
 import { db } from "@/db";
 import { marketingLeads } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
-import { LeadDetailClient } from "./LeadDetailClient";
+import { LeadDetailClient, Lead } from "./LeadDetailClient";
 
 interface LeadPageProps {
   params: Promise<{ id: string }>;
@@ -12,7 +11,7 @@ interface LeadPageProps {
 
 export async function generateMetadata({ params }: LeadPageProps) {
   const { id } = await params;
-  
+
   const lead = await db.query.marketingLeads.findFirst({
     where: eq(marketingLeads.id, id),
   });
@@ -33,15 +32,23 @@ export default async function LeadDetailPage({ params }: LeadPageProps) {
   }
 
   const { id } = await params;
-  
-  const lead = await db.query.marketingLeads.findFirst({
+
+  const leadData = await db.query.marketingLeads.findFirst({
     where: eq(marketingLeads.id, id),
     // If you add relations later, they can be fetched here
   });
 
-  if (!lead) {
+  if (!leadData) {
     notFound();
   }
+
+  // Cast the data to match the component's expected type
+  // properties replyThread and metadata are inferred as unknown by Drizzle
+  const lead: Lead = {
+    ...leadData,
+    replyThread: leadData.replyThread as any,
+    metadata: leadData.metadata as any
+  };
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">

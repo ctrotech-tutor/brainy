@@ -7,6 +7,7 @@ import { RoleGuard } from "@/lib/utils/roles";
 import { eq, and, count, SQL, sql, desc } from "drizzle-orm";
 import { z } from "zod";
 import { ApiResponses } from "@/lib/api-response";
+import { Cache } from "@/lib/cache";
 
 // Zod schema for validating query parameters
 const querySchema = z.object({
@@ -32,6 +33,10 @@ export async function GET(req: NextRequest) {
 
     const { page, limit, query } = validation.data;
     const offset = (page - 1) * limit;
+
+    const CACHE_KEY = Cache.key("platform", "audit", page, limit, query || "all");
+    const cached = await Cache.get<any>(CACHE_KEY);
+    if (cached) return ApiResponses.success(cached);
 
     // --- Dynamic Query Construction ---
     // We will search in the action itself, or in the actor's name/email
@@ -65,7 +70,7 @@ export async function GET(req: NextRequest) {
         .orderBy(desc(auditLogs.createdAt)) // Order by most recent first
         .limit(limit)
         .offset(offset),
-      
+
       // Count query for pagination
       // We need to join here as well to filter by actor
       db
@@ -78,8 +83,7 @@ export async function GET(req: NextRequest) {
     const totalResults = total[0].value;
     const totalPages = Math.ceil(totalResults / limit);
 
-    // --- Response ---
-    return ApiResponses.success({
+    const responseData = {
       data,
       pagination: {
         currentPage: page,
@@ -87,7 +91,12 @@ export async function GET(req: NextRequest) {
         totalResults,
         limit,
       },
-    });
+    };
+
+    await Cache.set(CACHE_KEY, responseData, 60); // 1 minute
+
+    // --- Response ---
+    return ApiResponses.success(responseData);
 
   } catch (error) {
     return ApiResponses.handleError(error);

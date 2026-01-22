@@ -8,6 +8,7 @@ import { eq, desc, and, ilike, count, SQL } from "drizzle-orm";
 import { z } from "zod";
 import { createId } from "@paralleldrive/cuid2";
 import { ApiResponses } from "@/lib/api-response";
+import { Cache } from "@/lib/cache";
 
 // Query schema for listing
 const querySchema = z.object({
@@ -50,6 +51,12 @@ export async function GET(req: NextRequest) {
     const { page, limit, search, status } = validation.data;
     const offset = (page - 1) * limit;
 
+    const CACHE_KEY = Cache.key("platform", "blog", page, limit, search || "all", status || "all");
+    const cached = await Cache.get<any>(CACHE_KEY);
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
     const whereClauses: (SQL | undefined)[] = [
       search ? ilike(blogPosts.title, `%${search}%`) : undefined,
       status ? eq(blogPosts.status, status) : undefined,
@@ -78,7 +85,7 @@ export async function GET(req: NextRequest) {
     const totalResults = total[0].value;
     const totalPages = Math.ceil(totalResults / limit);
 
-    return NextResponse.json({
+    const responseData = {
       data,
       pagination: {
         currentPage: page,
@@ -86,7 +93,11 @@ export async function GET(req: NextRequest) {
         totalResults,
         limit,
       },
-    });
+    };
+
+    await Cache.set(CACHE_KEY, responseData, 900); // 15 minutes
+
+    return NextResponse.json(responseData);
   } catch (error) {
     return ApiResponses.handleError(error);
   }
